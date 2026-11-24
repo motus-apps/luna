@@ -1,5 +1,7 @@
-const CACHE = 'luna-v1';
-const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+importScripts('core.js');
+
+const CACHE = 'luna-v2';
+const FILES = ['./', 'index.html', 'core.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -19,4 +21,43 @@ self.addEventListener('fetch', e => {
       .then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; })
       .catch(() => caches.match(e.request, { ignoreSearch: true }).then(r => r || caches.match('index.html')))
   );
+});
+
+// ---- Benachrichtigungen ----
+const db = () => new Promise((res, rej) => {
+  const r = indexedDB.open('luna', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('kv');
+  r.onsuccess = () => res(r.result);
+  r.onerror = () => rej(r.error);
+});
+const get = async k => { const d = await db(); return new Promise(res => { const q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); }); };
+const set = async (k, v) => { const d = await db(); return new Promise(res => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = res; }); };
+
+async function check() {
+  const S = await get('state');
+  if (!S || !S.notify || !S.notify.on) return;
+  if (self.Notification && Notification.permission !== 'granted') return;
+  const sent = (await get('sent')) || {}, T = LunaCore.T0();
+  let changed = false;
+  for (const p of S.persons || []) {
+    for (const ev of LunaCore.events(p, T, S.notify)) {
+      if (sent[ev.key]) continue;
+      await self.registration.showNotification(ev.title, { body: ev.body, icon: 'icons/icon-192.png', tag: ev.key, data: { url: './' } });
+      sent[ev.key] = Date.now();
+      changed = true;
+    }
+  }
+  if (changed) {
+    const limit = Date.now() - 90 * LunaCore.DAY;
+    for (const k in sent) if (sent[k] < limit) delete sent[k];
+    await set('sent', sent);
+  }
+}
+
+self.addEventListener('periodicsync', e => { if (e.tag === 'luna-daily') e.waitUntil(check()); });
+self.addEventListener('message', e => { if (e.data === 'check') e.waitUntil(check()); });
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true })
+    .then(cs => cs.length ? cs[0].focus() : clients.openWindow('./')));
 });

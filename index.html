@@ -11,15 +11,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#120c16">
 <meta name="apple-mobile-web-app-title" content="Luna">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* VOICE: tender, ruhig, privat – ein persönliches Werkzeug, kein Medizingerät
-   IDEA: ein Zyklus-Rad wie eine Mondscheibe, Tag für Tag als Segment
-   PICTURE: großes Ring-Diagramm mit Markierung des heutigen Tages
-   COLOUR and TYPE: Rosé-Grund, Beerenrot, Phasenfarben; Fraunces + Figtree
-   LAYOUT: Ring + Phasenkarte oben, darunter Prognosen; Tabs für Kalender, Verlauf, Einstellungen */
 :root{color-scheme:light dark;
 --bg:light-dark(#fbf3f2,#171014);--card:light-dark(#fff,#21171c);--ink:light-dark(#2b1a20,#f5e9eb);
 --mut:light-dark(#7c666d,#b8a2a9);--line:light-dark(#efdfe1,#382930);
@@ -37,7 +31,13 @@ header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-cont
 nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;overflow-x:auto}
 nav a{flex:none;padding:9px 16px;border-radius:999px;color:var(--mut);text-decoration:none;font-weight:500;min-height:40px}
 nav a.on{background:var(--ink);color:var(--bg)}
-nav a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,.c:focus-visible{outline:3px solid var(--fert);outline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--fert);outline-offset:2px}
+.people{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px}
+.people button{flex:none;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 16px 6px 8px;font-weight:500}
+.people button .em{font-size:22px;line-height:1}
+.people button .pd{width:9px;height:9px;border-radius:50%}
+.people button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.people button.add{padding:6px 16px;color:var(--mut)}
 section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,4vw,56px);align-items:center}
 .ring{position:relative;width:min(100%,380px);aspect-ratio:1;margin:0 auto}
@@ -49,7 +49,7 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .lead{font-size:17px;color:var(--mut);max-width:60ch;margin:14px 0 18px}
 ul.tips{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:8px}
 ul.tips li{padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;border-left:4px solid var(--pc)}
-button,.btn{font:600 16px Figtree,sans-serif;min-height:46px;padding:10px 20px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button,.btn{font:600 16px Figtree,sans-serif;min-height:46px;padding:10px 20px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 button.pri{background:var(--mens);border-color:var(--mens);color:#fff}
 button.ghost{background:none}button:disabled{opacity:.5;cursor:default}
 button.danger{color:var(--mens)}
@@ -58,18 +58,21 @@ button.danger{color:var(--mens)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px}
 .card small{color:var(--mut);display:block;font-size:14px}
 .card strong{font:600 24px/1.2 Fraunces,serif;display:block;margin:4px 0 2px}
-.card span{color:var(--mut);font-size:14px}
+.card>span{color:var(--mut);font-size:14px}
 .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:14px;font-size:14px;color:var(--mut)}
 .legend span{display:flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:3px}
 .up{margin-top:36px}.up h3{margin-bottom:12px}
 .up ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.up li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.up li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .up li span{color:var(--mut);white-space:nowrap}
-.setup{max-width:520px}.setup .lead{margin-bottom:22px}
+.setup{max-width:520px}.setup .lead{margin-bottom:10px}
 label{display:block;font-weight:600;margin:16px 0 6px}
-input[type=date],input[type=number],textarea{font:16px Figtree,sans-serif;width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+input[type=date],input[type=number],input[type=text],textarea{font:16px Figtree,sans-serif;width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 textarea{min-height:90px;resize:vertical}
 .hint{color:var(--mut);font-size:14px;margin:6px 0 0}
+.emo{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.emo button{padding:0;min-height:44px;font-size:22px;border-radius:12px}
+.emo button.on{border:2px solid var(--ink);background:color-mix(in srgb,var(--lut) 18%,var(--card))}
 .calhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .calhead h2{font-size:clamp(26px,4vw,36px)}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
@@ -96,29 +99,32 @@ textarea{min-height:90px;resize:vertical}
 .hist .bar{flex:1 1 120px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
 .hist .bar i{display:block;height:100%;background:var(--mens)}
 .hist b{white-space:nowrap}.hist span{color:var(--mut);white-space:nowrap;font-size:15px}
-.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
-.chk{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:16px}
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;align-items:start}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:14px}
 .chk input{width:22px;height:22px;accent-color:var(--mens);flex:none;margin-top:2px}
+.chk small{display:block;color:var(--mut);font-weight:400;font-size:14px}
+.status{margin-top:12px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--foll) 14%,var(--card));font-size:14px}
+.status.warn{background:color-mix(in srgb,var(--fert) 18%,var(--card))}
 .note{font-size:13px;color:var(--mut);margin-top:40px;max-width:70ch}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;transition:.25s;pointer-events:none;font-weight:500;max-width:90vw}
 #toast.on{opacity:1;transform:translate(-50%,0)}
-.seg{transition:opacity .4s}
-@media(prefers-reduced-motion:reduce){.seg,#toast{transition:none}}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
 @media(max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.ring{width:min(100%,320px)}}
-@media(max-width:420px){nav{width:100%}nav a{padding:9px 11px;font-size:15px}.cal{gap:4px}.c{border-radius:10px;font-size:14px}.c::after{bottom:4px}}
+@media(max-width:420px){nav{width:100%}nav a{padding:9px 11px;font-size:15px}.cal{gap:4px}.c{border-radius:10px;font-size:14px}.c::after{bottom:4px}.emo{grid-template-columns:repeat(6,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
   <div class="brand"><img src="icons/icon.svg" alt="" width="34" height="34">Luna</div>
-  <nav class="scroll" id="nav">
+  <nav id="nav">
     <a href="#heute" data-v="heute">Heute</a>
     <a href="#kalender" data-v="kalender">Kalender</a>
     <a href="#verlauf" data-v="verlauf">Verlauf</a>
     <a href="#einstellungen" data-v="einstellungen">Einstellungen</a>
   </nav>
 </header>
+<div class="people" id="people"></div>
 
 <section class="view" id="v-heute"></section>
 
@@ -134,7 +140,7 @@ textarea{min-height:90px;resize:vertical}
 </section>
 
 <section class="view" id="v-verlauf">
-  <h2>Verlauf</h2>
+  <h2 id="histTitle">Verlauf</h2>
   <div class="stats" id="stats"></div>
   <ul class="hist" id="hist"></ul>
   <div class="card" style="margin-top:24px">
@@ -148,14 +154,39 @@ textarea{min-height:90px;resize:vertical}
   <h2>Einstellungen</h2>
   <div class="set" style="margin-top:20px">
     <div class="card">
-      <h3>Zyklus</h3>
+      <h3 id="pTitle">Person</h3>
+      <label for="pName">Name</label>
+      <input type="text" id="pName" maxlength="30" autocomplete="off">
+      <label>Emoji</label>
+      <div class="emo" id="pEmo"></div>
       <label for="sCyc">Zykluslänge (Tage)</label>
       <input type="number" id="sCyc" min="20" max="45">
       <label for="sPer">Dauer der Periode (Tage)</label>
       <input type="number" id="sPer" min="2" max="10">
-      <label class="chk"><input type="checkbox" id="sAuto"><span>Zykluslänge automatisch aus dem Verlauf berechnen (Ø der letzten 6 Zyklen)</span></label>
-      <p class="hint" id="autoHint"></p>
+      <label class="chk"><input type="checkbox" id="sAuto"><span>Zykluslänge automatisch aus dem Verlauf berechnen<small id="autoHint"></small></span></label>
+      <div class="row" style="margin-top:18px"><button class="danger" id="pDel">Person entfernen</button></div>
     </div>
+
+    <div class="card">
+      <h3>Benachrichtigungen</h3>
+      <p class="hint">Kurze Hinweise im richtigen Moment – für alle eingetragenen Personen.</p>
+      <div class="row" style="margin-top:12px"><button class="pri" id="nOn">Benachrichtigungen aktivieren</button><button class="ghost" id="nTest">Test</button></div>
+      <div class="status" id="nStatus"></div>
+      <label class="chk"><input type="checkbox" data-n="pms"><span>Emotionale Tage<small>2 Tage vorher und zu Beginn der PMS-Zeit</small></span></label>
+      <label class="chk"><input type="checkbox" data-n="fert"><span>Fruchtbare Tage – verhüten<small>Am ersten Tag des fruchtbaren Fensters</small></span></label>
+      <label class="chk"><input type="checkbox" data-n="buffer"><span>Sicherheitspuffer für die fruchtbaren Tage<small>Fenster 3 Tage früher beginnen und 2 Tage später enden lassen</small></span></label>
+      <label class="chk"><input type="checkbox" data-n="mood"><span>Hochphase – sehr gute Laune<small>Kurz vor dem Eisprung</small></span></label>
+      <label class="chk"><input type="checkbox" data-n="period"><span>Periode<small>Am Vortag, am erwarteten Tag und bei 3 Tagen Verspätung</small></span></label>
+    </div>
+
+    <div class="card">
+      <h3>Im Kalender erinnern</h3>
+      <p class="hint">Der zuverlässigste Weg zu Erinnerungen zur festen Uhrzeit: Luna legt die nächsten 6 Zyklen als Termine mit Erinnerung in deinem Handy-Kalender an. Nach Änderungen einfach neu exportieren.</p>
+      <label class="chk"><input type="checkbox" id="calNeutral"><span>Neutrale Titel<small>Nur Symbol und „Luna“, kein Name, keine Phase – falls der Kalender mit anderen geteilt oder in der Cloud gespeichert wird</small></span></label>
+      <label class="chk"><input type="checkbox" id="calAll"><span>Alle Personen exportieren<small>Sonst nur die gerade ausgewählte</small></span></label>
+      <div class="row" style="margin-top:14px"><button id="calBtn">In Kalender übernehmen</button></div>
+    </div>
+
     <div class="card">
       <h3>Backup</h3>
       <p class="hint">Alle Daten liegen nur hier im Browser. Für ein Backup den Text kopieren und z. B. in einem Passwortmanager oder einer Notiz sichern.</p>
@@ -163,12 +194,7 @@ textarea{min-height:90px;resize:vertical}
       <textarea id="exp" readonly placeholder="Hier erscheint das Backup" style="margin-top:10px"></textarea>
       <label for="imp">Backup wiederherstellen</label>
       <textarea id="imp" placeholder="Backup-Text hier einfügen"></textarea>
-      <div class="row" style="margin-top:10px"><button id="impBtn">Wiederherstellen</button></div>
-    </div>
-    <div class="card">
-      <h3>Alles löschen</h3>
-      <p class="hint">Entfernt alle Einträge und Notizen aus diesem Browser.</p>
-      <div class="row" style="margin-top:12px"><button class="danger" id="rstBtn">Alle Daten löschen</button></div>
+      <div class="row" style="margin-top:10px"><button id="impBtn">Wiederherstellen</button><button class="danger ghost" id="rstBtn">Alle Daten löschen</button></div>
     </div>
   </div>
 </section>
@@ -177,124 +203,136 @@ textarea{min-height:90px;resize:vertical}
 </div>
 <div id="toast" role="status"></div>
 
+<script src="core.js"></script>
 <script>
 {
-const DAY=864e5,KEY='zyklus-app-v1';
+const C=LunaCore,{toN,toS,T0,fmt,starts,gaps,avg,phase,info,nextStart}=C;
+const KEY='zyklus-app-v1';
 const $=s=>document.querySelector(s);
-const toN=s=>{const[y,m,d]=s.split('-').map(Number);return Math.round(Date.UTC(y,m-1,d)/DAY)};
-const toS=n=>new Date(n*DAY).toISOString().slice(0,10);
-const T0=()=>{const t=new Date();return Math.round(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/DAY)};
-const fmt=(n,o={day:'numeric',month:'long'})=>new Date(n*DAY).toLocaleDateString('de-DE',{timeZone:'UTC',...o});
 const wd=n=>fmt(n,{weekday:'short',day:'numeric',month:'short'});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const inDays=d=>d===0?'heute':d===1?'morgen':d===-1?'gestern':d>0?`in ${d} Tagen`:`vor ${-d} Tagen`;
-const fresh=()=>({starts:[],cycle:28,period:5,auto:true,notes:{}});
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,Math.round(x)));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const EMO=['🌸','🌙','🌷','🦋','✨','💜','🌻','🍓','🌊','🌿','☀️','🔥','💐','👑','🐱','🍒'];
+const person=(o={})=>({id:uid(),name:'',emoji:'🌸',starts:[],cycle:28,period:5,auto:true,notes:{},...o});
+const fresh=()=>{const p=person();return{v:2,persons:[p],active:p.id,notify:{on:false,pms:true,fert:true,buffer:true,mood:true,period:true},cal:{neutral:false,all:true}}};
+function migrate(o){
+ if(!o)return fresh();
+ if(!o.persons){const p=person({starts:o.starts||[],cycle:o.cycle||28,period:o.period||5,auto:o.auto!==false,notes:o.notes||{}});const f=fresh();f.persons=[p];f.active=p.id;return f}
+ const f=fresh();return{...f,...o,notify:{...f.notify,...o.notify},cal:{...f.cal,...o.cal}};
+}
 let canSave=true;
-function load(){try{const r=localStorage.getItem(KEY);return r?{...fresh(),...JSON.parse(r)}:fresh()}catch(e){canSave=false;return fresh()}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){canSave=false}foot()}
-let S=load();
+function load(){try{const r=localStorage.getItem(KEY);return migrate(r&&JSON.parse(r))}catch(e){canSave=false;return fresh()}}
+let S=load(),adding=false;
+const P=()=>S.persons.find(p=>p.id===S.active)||S.persons[0];
+
+// IndexedDB-Spiegel für den Service Worker
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('luna',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function mirror(){try{const d=await idb();d.transaction('kv','readwrite').objectStore('kv').put(JSON.parse(JSON.stringify(S)),'state')}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){canSave=false}mirror();foot()}
+function swCheck(){if('serviceWorker' in navigator)navigator.serviceWorker.ready.then(r=>r.active&&r.active.postMessage('check')).catch(()=>{})}
 
 const PH={
  mens:{n:'Periode',t:'Die Gebärmutterschleimhaut wird abgestoßen. Viele fühlen sich jetzt müder, Krämpfe und Rückenschmerzen sind häufig.',tips:['Wärmflasche oder Tee anbieten','Pläne lieber locker halten','Schmerzmittel und Periodenprodukte im Haus?']},
  foll:{n:'Follikelphase',t:'Östrogen steigt, ein neues Ei reift heran. Energie und Laune ziehen oft spürbar an.',tips:['Gute Zeit für Unternehmungen und Neues','Sport und Aktivitäten fallen oft leichter']},
- fert:{n:'Fruchtbare Tage',t:'Rund um den Eisprung ist eine Schwangerschaft am wahrscheinlichsten. Viele fühlen sich jetzt besonders wohl und gesellig.',tips:['Schöne Zeit für einen Date-Abend','Kinderwunsch: jetzt ist das Zeitfenster','Kein Kinderwunsch: die Rechnung hier ist keine Verhütung']},
- ovu:{n:'Eisprung (geschätzt)',t:'Rechnerisch der fruchtbarste Tag. Manche spüren ein leichtes Ziehen im Unterbauch.',tips:['Oft viel Energie und gute Laune','Kein Kinderwunsch: die Rechnung hier ist keine Verhütung']},
+ fert:{n:'Fruchtbare Tage',t:'Rund um den Eisprung ist eine Schwangerschaft am wahrscheinlichsten. Viele fühlen sich jetzt besonders wohl und gesellig.',tips:['Schöne Zeit für einen Date-Abend','Kinderwunsch: jetzt ist das Zeitfenster','Kein Kinderwunsch: nur mit sicherer Verhütung – die Rechnung ist keine Verhütung']},
+ ovu:{n:'Eisprung (geschätzt)',t:'Rechnerisch der fruchtbarste Tag. Manche spüren ein leichtes Ziehen im Unterbauch.',tips:['Oft viel Energie und gute Laune','Kein Kinderwunsch: nur mit sicherer Verhütung']},
  lut:{n:'Lutealphase',t:'Progesteron übernimmt, der Körper stellt sich auf eine mögliche Schwangerschaft ein. Oft ruhiger, mit mehr Lust auf Gemütlichkeit.',tips:['Gemütliche Abende statt Großprogramm','Genug Schlaf – der Körper arbeitet mehr']},
  pms:{n:'Kurz vor der Periode',t:'Die Hormone fallen ab. PMS ist jetzt möglich: Reizbarkeit, Heißhunger, Brustspannen, schlechter Schlaf.',tips:['Extra Geduld – nichts persönlich nehmen','Lieblingssnack besorgen','Vorrat an Periodenprodukten checken']},
  late:{n:'Periode verspätet',t:'Die Periode kommt später als berechnet. Ein paar Tage Schwankung sind normal – Stress, Krankheit oder Reisen verschieben den Zyklus.',tips:['Sobald sie beginnt: „Periode hat begonnen“ tippen','Bei deutlich mehr als einer Woche ggf. Test oder Frauenärztin']}
 };
 const LEG=[['mens','Periode'],['foll','Follikelphase'],['fert','Fruchtbar'],['ovu','Eisprung'],['lut','Lutealphase'],['pms','Vor der Periode']];
 const SYM=['Krämpfe','Kopfweh','Müde','Gereizt','Heißhunger','Empfindlich','Gut drauf','Viel Energie'];
-
-const starts=()=>[...new Set(S.starts)].map(toN).sort((a,b)=>a-b);
-const gaps=()=>{const s=starts(),g=[];for(let i=1;i<s.length;i++){const d=s[i]-s[i-1];if(d>=15&&d<=60)g.push(d)}return g};
-function avg(){const g=gaps().slice(-6);return S.auto&&g.length?Math.round(g.reduce((a,b)=>a+b,0)/g.length):S.cycle}
-function phase(d,len,P){
- if(d>len)return'late';if(d<=P)return'mens';
- const o=len-14;if(d===o)return'ovu';
- if(d>=o-5&&d<=o+1)return'fert';if(d<o-5)return'foll';
- return d>len-5?'pms':'lut';
-}
-function info(n){
- const st=starts();if(!st.length||n<st[0])return null;
- const T=T0(),L=avg();let i=st.length-1;while(st[i]>n)i--;
- let s=st[i],len,proj=false;
- if(i<st.length-1)len=st[i+1]-s;
- else{len=L;const a=T>=s+L?T+1:s+L;if(n>=a){s=a+Math.floor((n-a)/L)*L;proj=true}}
- const day=n-s+1;return{s,len,day,proj,ph:phase(day,len,S.period)};
-}
-function nextStart(){const st=starts(),s=st[st.length-1],L=avg(),T=T0();return T>=s+L?{n:T+1,late:T-(s+L)+1}:{n:s+L,late:0}}
-
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
-function foot(){$('#foot').textContent=(canSave?'Alle Daten werden nur lokal in diesem Browser gespeichert – nichts verlässt das Gerät. ':'Speichern ist in dieser Ansicht nicht möglich – Einträge gehen beim Schließen verloren. ')+'Die Phasen sind eine Rechnung auf Basis von Durchschnittswerten, keine medizinische Auskunft und keine Verhütungsmethode.'}
-function addStart(n){const s=toS(n);if(S.starts.includes(s))return false;S.starts.push(s);S.starts.sort();save();return true}
-function delStart(s){S.starts=S.starts.filter(x=>x!==s);save()}
 const legend=()=>LEG.map(([k,n])=>`<span><i style="background:var(--${k})"></i>${n}</span>`).join('');
+const pname=p=>p.name||'Ohne Name';
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2400)}
+function foot(){$('#foot').textContent=(canSave?'Alle Daten werden nur lokal auf diesem Gerät gespeichert – kein Konto, kein Server. ':'Speichern ist hier nicht möglich – Einträge gehen beim Schließen verloren. ')+'Die Phasen sind eine Rechnung mit Durchschnittswerten, keine medizinische Auskunft und keine Verhütungsmethode.'}
+function addStart(p,n){const s=toS(n);if(p.starts.includes(s))return false;p.starts.push(s);p.starts.sort();save();return true}
+function delStart(p,s){p.starts=p.starts.filter(x=>x!==s);save()}
+const emoGrid=(sel)=>EMO.map(e=>`<button type="button" data-e="${e}" class="${e===sel?'on':''}" aria-label="${e}" aria-pressed="${e===sel}">${e}</button>`).join('');
+
+/* ---------- Personen ---------- */
+function renderPeople(){
+ const T=T0();
+ $('#people').innerHTML=S.persons.map(p=>{const inf=p.starts.length?info(p,T,T):null;
+  return `<button data-p="${p.id}" class="${p.id===S.active&&!adding?'on':''}"><span class="em">${esc(p.emoji)}</span>${esc(pname(p))}${inf?`<span class="pd" style="background:var(--${inf.ph})" title="${PH[inf.ph].n}"></span>`:''}</button>`}).join('')
+  +`<button class="add${adding?' on':''}" id="pAdd">+ Person</button>`;
+}
+$('#people').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.id==='pAdd'){adding=true;location.hash='#heute'}else{adding=false;S.active=b.dataset.p;save()}
+ sel=null;render()};
 
 /* ---------- Heute ---------- */
-function ringSVG(day,len,late){
- const tot=Math.max(len,day),cx=160,r=128,P=S.period,g=.9;
+function ringSVG(p,day,len){
+ const tot=Math.max(len,day),cx=160,r=128,g=.9;
  const pt=a=>[cx+r*Math.cos(a*Math.PI/180),cx+r*Math.sin(a*Math.PI/180)];
  let h='';
  for(let i=1;i<=tot;i++){
-  const a0=-90+(i-1)*360/tot+g,a1=-90+i*360/tot-g,[x0,y0]=pt(a0),[x1,y1]=pt(a1),ph=phase(i,len,P);
-  h+=`<path class="seg" d="M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}" stroke="var(--${ph})" stroke-width="24" fill="none" opacity="${i<=day?1:.32}"/>`;
+  const [x0,y0]=pt(-90+(i-1)*360/tot+g),[x1,y1]=pt(-90+i*360/tot-g);
+  h+=`<path d="M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}" stroke="var(--${phase(i,len,p.period)})" stroke-width="24" fill="none" opacity="${i<=day?1:.32}"/>`;
  }
  const [mx,my]=pt(-90+(day-.5)*360/tot);
- h+=`<circle cx="${mx}" cy="${my}" r="19" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/><circle cx="${mx}" cy="${my}" r="8" fill="var(--${phase(day,len,P)})"/>`;
+ h+=`<circle cx="${mx}" cy="${my}" r="19" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/><circle cx="${mx}" cy="${my}" r="8" fill="var(--${phase(day,len,p.period)})"/>`;
  return `<svg viewBox="0 0 320 320" role="img" aria-label="Zyklus-Rad, Tag ${day} von ${len}">${h}</svg>`;
 }
-function renderToday(){
- const v=$('#v-heute'),T=T0();
- if(!S.starts.length){
-  v.innerHTML=`<div class="setup"><h2>Wo steht der Zyklus gerade?</h2>
-  <p class="lead">Einmal den ersten Tag der letzten Periode eintragen – ab dann zeigt die App jeden Tag, in welcher Phase sie ist und was als Nächstes kommt.</p>
+function renderSetup(v,p,isNew){
+ const T=T0();
+ v.innerHTML=`<div class="setup"><h2>${isNew?'Neue Person':'Willkommen bei Luna'}</h2>
+  <p class="lead">Einmal den ersten Tag der letzten Periode eintragen – ab dann zeigt Luna jeden Tag, in welcher Phase sie ist und was als Nächstes kommt.</p>
+  <label for="iName">Name</label><input type="text" id="iName" maxlength="30" autocomplete="off" value="${esc(p?p.name:'')}" placeholder="z. B. Vorname oder Spitzname">
+  <label>Emoji</label><div class="emo" id="iEmo">${emoGrid(p?p.emoji:EMO[S.persons.length%EMO.length])}</div>
   <label for="iDate">Erster Tag der letzten Periode</label><input type="date" id="iDate" max="${toS(T)}" value="${toS(T-7)}">
   <label for="iCyc">Zykluslänge</label><input type="number" id="iCyc" min="20" max="45" value="28"><p class="hint">Von einem Periodenbeginn zum nächsten. Unsicher? 28 passt für viele.</p>
   <label for="iPer">Dauer der Periode</label><input type="number" id="iPer" min="2" max="10" value="5">
-  <div class="row" style="margin-top:22px"><button class="pri" id="iGo">Los geht’s</button></div></div>`;
-  $('#iGo').onclick=()=>{const d=$('#iDate').value;if(!d||toN(d)>T){toast('Bitte ein Datum bis heute wählen');return}
-   S.cycle=clamp(+$('#iCyc').value||28,20,45);S.period=clamp(+$('#iPer').value||5,2,10);addStart(toN(d));toast('Gespeichert');render()};
-  return;
- }
- const inf=info(T),L=avg(),P=S.period,p=PH[inf.ph],ns=nextStart(),o=L-14;
- const late=inf.ph==='late';
+  <div class="row" style="margin-top:22px"><button class="pri" id="iGo">Speichern</button>${isNew?'<button class="ghost" id="iCancel">Abbrechen</button>':''}</div></div>`;
+ $('#iEmo').onclick=e=>{const b=e.target.closest('[data-e]');if(!b)return;$('#iEmo').querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)})};
+ $('#iGo').onclick=()=>{const d=$('#iDate').value;if(!d||toN(d)>T){toast('Bitte ein Datum bis heute wählen');return}
+  const q=isNew?person():p;
+  q.name=$('#iName').value.trim();q.emoji=($('#iEmo .on')||{}).dataset?.e||'🌸';
+  q.cycle=clamp(+$('#iCyc').value||28,20,45);q.period=clamp(+$('#iPer').value||5,2,10);
+  if(isNew){S.persons.push(q);S.active=q.id}
+  adding=false;addStart(q,toN(d));save();toast('Gespeichert');render()};
+ const c=$('#iCancel');if(c)c.onclick=()=>{adding=false;render()};
+}
+function renderToday(){
+ const v=$('#v-heute'),T=T0(),p=P();
+ if(adding)return renderSetup(v,null,true);
+ if(!p.starts.length)return renderSetup(v,p,false);
+ const inf=info(p,T,T),L=avg(p),Pd=p.period,ph=PH[inf.ph],ns=nextStart(p,T),o=L-14,late=inf.ph==='late';
  const mid=late?`<small>Periode</small><b>+${inf.day-inf.len}</b><small>${inf.day-inf.len===1?'Tag':'Tage'} drüber</small>`:`<small>Zyklustag</small><b>${inf.day}</b><small>von ${inf.len}</small>`;
- // fruchtbares Fenster: aktuelles oder nächstes
  let fs=inf.s+o-6,fe=inf.s+o;if(T>fe||late){fs=ns.n+o-6;fe=ns.n+o}
- const ov=fe-1,pmsS=ns.n-5;
- const isStartToday=starts().includes(T);
- const pmsTxt=T>=pmsS&&T<ns.n?'läuft gerade':inDays(pmsS-T);
+ const ov=fe-1,pmsS=ns.n-5,isStartToday=starts(p).includes(T),pmsNow=T>=pmsS&&T<ns.n;
  const cards=[
-  ['Nächste Periode',late?`überfällig`:inDays(ns.n-T),late?`seit ${ns.late} ${ns.late===1?'Tag':'Tagen'}`:wd(ns.n)],
+  ['Nächste Periode',late?'überfällig':inDays(ns.n-T),late?`seit ${ns.late} ${ns.late===1?'Tag':'Tagen'}`:wd(ns.n)],
   ['Fruchtbares Fenster',T>=fs&&T<=fe?'jetzt':inDays(fs-T),`${fmt(fs,{day:'numeric',month:'short'})} – ${fmt(fe,{day:'numeric',month:'short'})}`],
-  ['Eisprung (geschätzt)',ov===T?'heute':inDays(ov-T),wd(ov)],
-  ['PMS möglich ab',pmsTxt,wd(pmsS)]
+  ['Hochphase',T>=ov-3&&T<=ov+1?'jetzt':inDays(ov-3-T),`Eisprung etwa ${wd(ov)}`],
+  ['Emotionale Tage',pmsNow?'jetzt':inDays(pmsS-T),`ab ${wd(pmsS)}`]
  ];
- const ups=[0,1,2].map(k=>ns.n+k*L).map(n=>`<li><b>${fmt(n,{weekday:'long',day:'numeric',month:'long'})}</b><span>bis ${fmt(n+P-1,{day:'numeric',month:'short'})} · ${inDays(n-T)}</span></li>`).join('');
+ const ups=[0,1,2].map(k=>ns.n+k*L).map(n=>`<li><b>${fmt(n,{weekday:'long',day:'numeric',month:'long'})}</b><span>bis ${fmt(n+Pd-1,{day:'numeric',month:'short'})} · ${inDays(n-T)}</span></li>`).join('');
  v.innerHTML=`<div class="hero" style="--pc:var(--${inf.ph})">
-  <div><div class="ring">${ringSVG(inf.day,inf.len,late)}<div class="mid">${mid}</div></div><div class="legend">${legend()}</div></div>
-  <div><span class="tag">${fmt(T,{weekday:'long',day:'numeric',month:'long'})}</span>
-   <h2 style="margin-top:10px">${p.n}</h2><p class="lead">${p.t}</p>
-   <ul class="tips">${p.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+  <div><div class="ring">${ringSVG(p,inf.day,inf.len)}<div class="mid">${mid}</div></div><div class="legend">${legend()}</div></div>
+  <div><span class="tag">${p.name?esc(p.emoji+' '+p.name)+' · ':''}${fmt(T,{weekday:'long',day:'numeric',month:'long'})}</span>
+   <h2 style="margin-top:10px">${ph.n}</h2><p class="lead">${ph.t}</p>
+   <ul class="tips">${ph.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
    <div class="row"><button class="pri" id="startNow" ${isStartToday?'disabled':''}>${isStartToday?'Heute eingetragen':'Periode hat heute begonnen'}</button>
-   <a class="btn" href="#kalender" style="text-decoration:none;display:inline-flex;align-items:center">Anderer Tag?</a></div></div></div>
+   <a class="btn" href="#kalender">Anderer Tag?</a></div></div></div>
  <div class="grid">${cards.map(c=>`<div class="card"><small>${c[0]}</small><strong>${c[1]}</strong><span>${c[2]}</span></div>`).join('')}</div>
  <div class="up"><h3>Die nächsten Perioden</h3><ol>${ups}</ol>
- <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${S.auto&&gaps().length?' (Ø aus dem Verlauf)':''} und ${P} Tagen Periode.</p></div>`;
- const b=$('#startNow');if(b)b.onclick=()=>{if(addStart(T)){toast('Neuer Zyklus gestartet');render()}};
+ <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${p.auto&&gaps(p).length?' (Ø aus dem Verlauf)':''} und ${Pd} Tagen Periode.</p></div>`;
+ $('#startNow').onclick=()=>{if(addStart(p,T)){toast('Neuer Zyklus gestartet');render()}};
 }
-const clamp=(x,a,b)=>Math.min(b,Math.max(a,Math.round(x)));
 
 /* ---------- Kalender ---------- */
 let cy,cm,sel=null;
 {const d=new Date();cy=d.getFullYear();cm=d.getMonth()}
 function renderCal(){
- const T=T0(),first=Math.round(Date.UTC(cy,cm,1)/DAY),dim=new Date(Date.UTC(cy,cm+1,0)).getUTCDate(),off=(new Date(first*DAY).getUTCDay()+6)%7,st=starts();
+ const p=P(),T=T0(),first=Math.round(Date.UTC(cy,cm,1)/C.DAY),dim=new Date(Date.UTC(cy,cm+1,0)).getUTCDate(),off=(new Date(first*C.DAY).getUTCDay()+6)%7,st=starts(p);
  $('#mon').textContent=new Date(Date.UTC(cy,cm,1)).toLocaleDateString('de-DE',{month:'long',year:'numeric',timeZone:'UTC'});
  let h=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="wd">${d}</div>`).join('')+'<div class="c e"></div>'.repeat(off);
  for(let i=0;i<dim;i++){
-  const n=first+i,inf=info(n),k=toS(n),nt=S.notes[k];
+  const n=first+i,inf=info(p,n,T),nt=p.notes[toS(n)];
   const cls=['c',inf?'p-'+inf.ph:'',inf&&(inf.proj||n>T)?'fut':'',n===T?'today':'',sel===n?'sel':''].join(' ');
   const pc=inf&&inf.ph!=='mens'?`style="--pc:var(--${inf.ph})"`:'';
   const lab=`${fmt(n,{weekday:'long',day:'numeric',month:'long'})}${inf?', '+PH[inf.ph].n:''}${st.includes(n)?', Periodenbeginn':''}`;
@@ -304,21 +342,21 @@ function renderCal(){
  renderDay();
 }
 function renderDay(){
- const box=$('#day');if(sel===null){box.innerHTML='<p class="hint" style="text-align:center;margin-top:18px">Tag antippen, um Periodenbeginn oder Notizen einzutragen.</p>';return}
- const n=sel,inf=info(n),k=toS(n),nt=S.notes[k]||{sym:[],text:''},isS=S.starts.includes(k),T=T0();
+ const box=$('#day'),p=P();if(sel===null){box.innerHTML='<p class="hint" style="text-align:center;margin-top:18px">Tag antippen, um Periodenbeginn oder Notizen einzutragen.</p>';return}
+ const n=sel,T=T0(),inf=info(p,n,T),k=toS(n),nt=p.notes[k]||{sym:[],text:''},isS=p.starts.includes(k);
  box.innerHTML=`<div class="card" style="--pc:var(--${inf?inf.ph:'late'})">
   <small>${fmt(n,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</small>
   <strong>${inf?`${inf.ph==='late'?'Verspätet':'Zyklustag '+inf.day} · ${PH[inf.ph].n}`:'Vor dem ersten Eintrag'}</strong>
   ${inf&&(inf.proj||n>T)?'<span>Prognose</span>':''}
   <div class="row" style="margin-top:14px">${n>T?'':isS?'<button class="danger" id="dS">Periodenbeginn entfernen</button>':'<button class="pri" id="aS">Periode begann an diesem Tag</button>'}</div>
-  <label>Wie geht’s ihr?</label><div class="chips">${SYM.map(s=>`<button data-s="${s}" class="${nt.sym.includes(s)?'on':''}" aria-pressed="${nt.sym.includes(s)}">${s}</button>`).join('')}</div>
+  <label>Wie geht’s ${p.name?esc(p.name):'ihr'}?</label><div class="chips">${SYM.map(s=>`<button data-s="${s}" class="${nt.sym.includes(s)?'on':''}" aria-pressed="${nt.sym.includes(s)}">${s}</button>`).join('')}</div>
   <label for="nTxt">Notiz</label><textarea id="nTxt" placeholder="z. B. Termin bei der Frauenärztin, war heute sehr müde …">${esc(nt.text)}</textarea></div>`;
- const setN=f=>{const c=S.notes[k]||{sym:[],text:''};f(c);if(!c.sym.length&&!c.text.trim())delete S.notes[k];else S.notes[k]=c;save()};
+ const setN=f=>{const c=p.notes[k]||{sym:[],text:''};f(c);if(!c.sym.length&&!c.text.trim())delete p.notes[k];else p.notes[k]=c;save()};
  box.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const s=b.dataset.s;setN(c=>{c.sym=c.sym.includes(s)?c.sym.filter(x=>x!==s):[...c.sym,s]});renderCal()});
  $('#nTxt').onchange=e=>{setN(c=>c.text=e.target.value);renderCal();toast('Notiz gespeichert')};
  const a=$('#aS'),d=$('#dS');
- if(a)a.onclick=()=>{addStart(n);toast('Periodenbeginn eingetragen');render()};
- if(d)d.onclick=()=>{delStart(k);toast('Eintrag entfernt');render()};
+ if(a)a.onclick=()=>{addStart(p,n);toast('Periodenbeginn eingetragen');render()};
+ if(d)d.onclick=()=>{delStart(p,k);toast('Eintrag entfernt');render()};
 }
 $('#cal').onclick=e=>{const b=e.target.closest('[data-n]');if(!b)return;sel=+b.dataset.n===sel?null:+b.dataset.n;renderCal()};
 $('#prev').onclick=()=>{cm--;if(cm<0){cm=11;cy--}renderCal()};
@@ -326,48 +364,121 @@ $('#next').onclick=()=>{cm++;if(cm>11){cm=0;cy++}renderCal()};
 
 /* ---------- Verlauf ---------- */
 function renderHist(){
- const st=starts(),g=gaps(),T=T0();
+ const p=P(),st=starts(p),g=gaps(p),T=T0();
+ $('#histTitle').textContent=p.name?`Verlauf · ${p.name}`:'Verlauf';
  const sv=(l,v,s)=>`<div class="card"><small>${l}</small><strong>${v}</strong><span>${s}</span></div>`;
- $('#stats').innerHTML=g.length?sv('Ø Zykluslänge',avg()+' Tage',S.auto?'letzte 6 Zyklen':'aus Einstellungen')+sv('Kürzester',Math.min(...g)+' Tage','')+sv('Längster',Math.max(...g)+' Tage','')+sv('Erfasste Zyklen',g.length,'abgeschlossen')
+ $('#stats').innerHTML=g.length?sv('Ø Zykluslänge',avg(p)+' Tage',p.auto?'letzte 6 Zyklen':'aus Einstellungen')+sv('Kürzester',Math.min(...g)+' Tage','')+sv('Längster',Math.max(...g)+' Tage','')+sv('Erfasste Zyklen',g.length,'abgeschlossen')
   :sv('Noch kein ganzer Zyklus',st.length?'1 Eintrag':'–','Ab dem zweiten Periodenbeginn wird der Schnitt berechnet');
  const mx=Math.max(35,...g);
  $('#hist').innerHTML=st.length?st.map((n,i)=>{const len=i<st.length-1?st[i+1]-n:null;
-  return `<li><b>${fmt(n,{day:'numeric',month:'short',year:'numeric'})}</b><div class="bar"><i style="width:${((len||T-n+1)/mx*100).toFixed(1)}%;opacity:${len?1:.4}"></i></div><span>${len?len+' Tage':'läuft · Tag '+(T-n+1)}</span><button class="ghost danger" data-d="${toS(n)}" aria-label="Eintrag ${fmt(n)} löschen">Löschen</button></li>`}).reverse().join('')
+  return `<li><b>${fmt(n,{day:'numeric',month:'short',year:'numeric'})}</b><div class="bar"><i style="width:${Math.min(100,(len||T-n+1)/mx*100).toFixed(1)}%;opacity:${len?1:.4}"></i></div><span>${len?len+' Tage':'läuft · Tag '+(T-n+1)}</span><button class="ghost danger" data-d="${toS(n)}" aria-label="Eintrag ${fmt(n)} löschen">Löschen</button></li>`}).reverse().join('')
   :'<li><span>Noch keine Einträge.</span></li>';
  $('#addDate').max=toS(T);
 }
-$('#hist').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;
- if(b.dataset.ok){delStart(b.dataset.d);toast('Eintrag gelöscht');render()}else{b.dataset.ok=1;b.textContent='Wirklich?';setTimeout(()=>{if(b.isConnected){delete b.dataset.ok;b.textContent='Löschen'}},3000)}};
+const twoStep=(b,label,ask,fn)=>{if(b.dataset.ok){fn()}else{b.dataset.ok=1;b.textContent=ask;setTimeout(()=>{if(b.isConnected){delete b.dataset.ok;b.textContent=label}},3500)}};
+$('#hist').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;twoStep(b,'Löschen','Wirklich?',()=>{delStart(P(),b.dataset.d);toast('Eintrag gelöscht');render()})};
 $('#addBtn').onclick=()=>{const d=$('#addDate').value;if(!d)return toast('Bitte ein Datum wählen');if(toN(d)>T0())return toast('Datum liegt in der Zukunft');
- toast(addStart(toN(d))?'Nachgetragen':'Ist schon eingetragen');$('#addDate').value='';render()};
+ toast(addStart(P(),toN(d))?'Nachgetragen':'Ist schon eingetragen');$('#addDate').value='';render()};
 
 /* ---------- Einstellungen ---------- */
-function renderSet(){
- $('#sCyc').value=S.cycle;$('#sPer').value=S.period;$('#sAuto').checked=S.auto;
- const g=gaps();$('#autoHint').textContent=S.auto?(g.length?`Aktuell gerechnet: ${avg()} Tage (aus ${Math.min(6,g.length)} Zyklen).`:'Noch kein ganzer Zyklus erfasst – bis dahin gilt der Wert oben.'):'Es gilt immer der Wert oben.';
+const hasN='Notification' in window&&'serviceWorker' in navigator;
+let bgSync=null,permRes=null;
+const perm=()=>permRes||Notification.permission;
+async function regPeriodic(){
+ try{const r=await navigator.serviceWorker.ready;if(!('periodicSync' in r))return false;
+  const st=await navigator.permissions.query({name:'periodic-background-sync'});if(st.state!=='granted')return false;
+  await r.periodicSync.register('luna-daily',{minInterval:12*3600e3});return true}catch(e){return false}
 }
-$('#sCyc').onchange=e=>{S.cycle=clamp(+e.target.value||28,20,45);save();render();toast('Gespeichert')};
-$('#sPer').onchange=e=>{S.period=clamp(+e.target.value||5,2,10);save();render();toast('Gespeichert')};
-$('#sAuto').onchange=e=>{S.auto=e.target.checked;save();render()};
-$('#expBtn').onclick=()=>{$('#exp').value=JSON.stringify({app:'luna',v:1,data:S})};
-$('#cpyBtn').onclick=()=>{const t=$('#exp');if(!t.value)t.value=JSON.stringify({app:'luna',v:1,data:S});
+function renderNotify(){
+ const n=S.notify,s=$('#nStatus'),btn=$('#nOn');
+ document.querySelectorAll('[data-n]').forEach(c=>{c.checked=n[c.dataset.n]!==false;c.disabled=!n.on});
+ $('#nTest').hidden=!(n.on&&hasN&&perm()==='granted');
+ if(!hasN){btn.hidden=true;s.className='status warn';s.textContent='Dieser Browser kann keine Benachrichtigungen anzeigen. Nutze stattdessen „Im Kalender erinnern“.';return}
+ if(perm()==='denied'){btn.hidden=true;s.className='status warn';s.textContent='Benachrichtigungen sind für Luna blockiert. Erlauben kannst du sie in den Website- bzw. App-Einstellungen des Browsers.';return}
+ btn.hidden=false;btn.textContent=n.on?'Ausschalten':'Benachrichtigungen aktivieren';btn.className=n.on?'ghost':'pri';
+ if(!n.on){s.className='status warn';s.textContent='Aus.';return}
+ s.className='status';
+ s.textContent=bgSync?'An – Luna schaut etwa einmal täglich im Hintergrund nach und meldet sich, wenn etwas ansteht. Die genaue Uhrzeit bestimmt das Handy.'
+  :'An – Hinweise kommen, sobald Luna geöffnet wird. Für Erinnerungen auch ohne Öffnen: Luna als App installieren (Android/Chrome) oder „Im Kalender erinnern“ nutzen.';
+}
+$('#nOn').onclick=async()=>{
+ if(S.notify.on){S.notify.on=false;save();renderNotify();return}
+ let r='denied';try{r=await Notification.requestPermission()}catch(e){}
+ permRes=r;
+ if(r!=='granted'){toast('Benachrichtigungen wurden nicht erlaubt');renderNotify();return}
+ S.notify.on=true;save();bgSync=await regPeriodic();renderNotify();toast('Benachrichtigungen an');swCheck();
+};
+$('#nTest').onclick=async()=>{try{const r=await navigator.serviceWorker.ready;const p=P();
+ await r.showNotification(C.who(p)+' · So sieht’s aus',{body:'Luna meldet sich bei emotionalen Tagen, fruchtbaren Tagen, Hochphasen und rund um die Periode.',icon:'icons/icon-192.png',tag:'luna-test'})}catch(e){toast('Test hat nicht geklappt')}};
+document.querySelectorAll('[data-n]').forEach(c=>c.onchange=()=>{S.notify[c.dataset.n]=c.checked;save()});
+
+function renderSet(){
+ const p=P();
+ $('#pTitle').textContent=p.name?`${p.emoji} ${p.name}`:'Person';
+ $('#pName').value=p.name;$('#pEmo').innerHTML=emoGrid(p.emoji);
+ $('#sCyc').value=p.cycle;$('#sPer').value=p.period;$('#sAuto').checked=p.auto;
+ const g=gaps(p);$('#autoHint').textContent=p.auto?(g.length?`Aktuell: ${avg(p)} Tage (Ø aus ${Math.min(6,g.length)} Zyklen)`:'Noch kein ganzer Zyklus erfasst – bis dahin gilt der Wert oben'):'Es gilt immer der Wert oben';
+ $('#pDel').hidden=S.persons.length<2;
+ $('#calNeutral').checked=S.cal.neutral;$('#calAll').checked=S.cal.all;$('#calAll').closest('label').hidden=S.persons.length<2;
+ renderNotify();
+}
+$('#pName').onchange=e=>{P().name=e.target.value.trim();save();render();toast('Gespeichert')};
+$('#pEmo').onclick=e=>{const b=e.target.closest('[data-e]');if(!b)return;P().emoji=b.dataset.e;save();render()};
+$('#sCyc').onchange=e=>{P().cycle=clamp(+e.target.value||28,20,45);save();render();toast('Gespeichert')};
+$('#sPer').onchange=e=>{P().period=clamp(+e.target.value||5,2,10);save();render();toast('Gespeichert')};
+$('#sAuto').onchange=e=>{P().auto=e.target.checked;save();render()};
+$('#pDel').onclick=e=>twoStep(e.target,'Person entfernen','Wirklich entfernen?',()=>{S.persons=S.persons.filter(p=>p.id!==S.active);S.active=S.persons[0].id;save();sel=null;render();toast('Person entfernt')});
+$('#calNeutral').onchange=e=>{S.cal.neutral=e.target.checked;save()};
+$('#calAll').onchange=e=>{S.cal.all=e.target.checked;save()};
+
+// Kalender-Export (.ics)
+const CALT={period:['Periode erwartet','🌙','Wärmflasche, Tee und Periodenprodukte bereithalten.',-300],
+ fert:['Fruchtbare Tage – verhüten','🔶','Schwangerschaft möglich. Kein Kinderwunsch: nur mit sicherer Verhütung. Die Rechnung ist eine Schätzung.',480],
+ mood:['Hochphase ✨','☀️','Oft besonders gute Laune und viel Energie – Zeit für ein Date.',480],
+ pms:['Emotionale Tage (PMS)','🌧️','Extra Geduld, nichts persönlich nehmen, Lieblingssnack besorgen.',-600]};
+function ics(){
+ const T=T0(),list=S.cal.all?S.persons:[P()],d8=n=>toS(n).replace(/-/g,''),stamp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+ const icEsc=s=>s.replace(/[\\,;]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+ const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Luna//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+ let cnt=0;
+ for(const p of list){if(!p.starts.length)continue;
+  for(const x of C.spans(p,S.notify,6,T)){const [t,sym,desc,mins]=CALT[x.type];
+   const title=S.cal.neutral?`${sym} Luna`:`${C.who(p)} · ${t}`;
+   const trig=mins<0?`-PT${-mins}M`:`PT${mins}M`;
+   L.push('BEGIN:VEVENT',`UID:luna-${p.id}-${x.type}-${d8(x.from)}@luna`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${d8(x.from)}`,`DTEND;VALUE=DATE:${d8(x.to+1)}`,
+    `SUMMARY:${icEsc(title)}`,...(S.cal.neutral?[]:[`DESCRIPTION:${icEsc(desc)}`]),'TRANSP:TRANSPARENT',
+    'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${icEsc(title)}`,`TRIGGER:${trig}`,'END:VALARM','END:VEVENT');cnt++}}
+ L.push('END:VCALENDAR');return cnt?L.join('\r\n'):null;
+}
+$('#calBtn').onclick=async()=>{
+ const txt=ics();if(!txt)return toast('Noch keine Daten zum Exportieren');
+ const file=new File([txt],'luna.ics',{type:'text/calendar'});
+ try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Luna'});return}}catch(e){if(e.name==='AbortError')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download='luna.ics';document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('luna.ics gespeichert – öffnen, um die Termine zu übernehmen');
+};
+
+// Backup
+const backup=()=>JSON.stringify({app:'luna',v:2,data:S});
+$('#expBtn').onclick=()=>{$('#exp').value=backup()};
+$('#cpyBtn').onclick=()=>{const t=$('#exp');if(!t.value)t.value=backup();
  navigator.clipboard.writeText(t.value).then(()=>toast('Kopiert')).catch(()=>{t.select();toast('Text markiert – jetzt kopieren')})};
 $('#impBtn').onclick=()=>{try{const o=JSON.parse($('#imp').value),d=o.data||o;
- if(!Array.isArray(d.starts)||!d.starts.every(s=>/^\d{4}-\d{2}-\d{2}$/.test(s)))throw 0;
- S={...fresh(),...d};save();$('#imp').value='';render();toast('Backup wiederhergestellt')}catch(e){toast('Das sieht nicht nach einem gültigen Backup aus')}};
-$('#rstBtn').onclick=e=>{const b=e.target;if(b.dataset.ok){S=fresh();save();sel=null;render();location.hash='#heute';toast('Alles gelöscht');delete b.dataset.ok;b.textContent='Alle Daten löschen'}
- else{b.dataset.ok=1;b.textContent='Wirklich alles löschen?';setTimeout(()=>{delete b.dataset.ok;b.textContent='Alle Daten löschen'},3500)}};
+ const ok=x=>Array.isArray(x.starts)&&x.starts.every(s=>/^\d{4}-\d{2}-\d{2}$/.test(s));
+ if(d.persons?!d.persons.length||!d.persons.every(ok):!ok(d))throw 0;
+ S=migrate(d);save();$('#imp').value='';sel=null;render();toast('Backup wiederhergestellt')}catch(e){toast('Das sieht nicht nach einem gültigen Backup aus')}};
+$('#rstBtn').onclick=e=>twoStep(e.target,'Alle Daten löschen','Wirklich alles löschen?',()=>{S=fresh();save();sel=null;adding=false;render();location.hash='#heute';toast('Alles gelöscht')});
 
 /* ---------- Routing ---------- */
 const VIEWS=['heute','kalender','verlauf','einstellungen'];
 function route(){const h=location.hash.slice(1),v=VIEWS.includes(h)?h:'heute';
  VIEWS.forEach(x=>{$('#v-'+x).classList.toggle('on',x===v);document.querySelector(`nav a[data-v=${x}]`).classList.toggle('on',x===v)})}
-function render(){renderToday();renderCal();renderHist();renderSet();foot()}
+function render(){renderPeople();renderToday();renderCal();renderHist();renderSet();foot()}
 addEventListener('hashchange',route);
-render();route();
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-// um Mitternacht weiterspringen
-let lastT=T0();setInterval(()=>{if(T0()!==lastT){lastT=T0();render()}},60000);
+render();route();mirror();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(async()=>{if(S.notify.on){bgSync=await regPeriodic();renderNotify()}swCheck()}).catch(()=>{});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){render();swCheck()}});
+let lastT=T0();setInterval(()=>{if(T0()!==lastT){lastT=T0();render();swCheck()}},60000);
 }
 </script>
 </body>
