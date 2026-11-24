@@ -148,6 +148,13 @@ textarea{min-height:90px;resize:vertical}
 .hist .bar{flex:1 1 120px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
 .hist .bar i{display:block;height:100%;background:var(--mens)}
 .hist b{white-space:nowrap}.hist span{color:var(--mut);white-space:nowrap;font-size:15px}
+.plist{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.plist button{width:100%;justify-content:flex-start;gap:12px;border-radius:16px;padding:10px 14px;min-height:60px;text-align:left;font-weight:500}
+.plist .em{font-size:26px;flex:none}.plist .pi{flex:1;min-width:0;display:grid}.plist .pi b{font-weight:600}
+.plist small{color:var(--mut);font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.plist small i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.plist .go{font-size:24px;color:var(--mut)}
+.back{padding:0 4px;min-height:40px;margin:-6px 0 6px;color:var(--mut);border:0}
+#pAddBox .setup h2{font-size:24px}
 .set{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;align-items:start}
 .chk{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:14px}
 .chk input{width:22px;height:22px;accent-color:var(--mens);flex:none;margin-top:2px}
@@ -314,7 +321,15 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
 <section class="view" id="v-einstellungen">
   <h2>Einstellungen</h2>
   <div class="set" style="margin-top:20px">
-    <div class="card">
+    <div class="card" id="pCard">
+     <div id="pList">
+      <h3>Personen</h3>
+      <ul class="plist" id="pRows"></ul>
+      <button id="pNew" style="margin-top:14px">+ Person hinzufügen</button>
+     </div>
+     <div id="pAddBox" hidden></div>
+     <div id="pEdit" hidden>
+      <button class="ghost back" id="pBack">‹ Alle Personen</button>
       <h3 id="pTitle">Person</h3>
       <label for="pName">Name</label>
       <input type="text" id="pName" maxlength="30" autocomplete="off">
@@ -328,7 +343,8 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
       <label for="sPer">Dauer der Periode (Tage)</label>
       <input type="number" id="sPer" min="2" max="10">
       <label class="chk"><input type="checkbox" id="sAuto"><span>Zykluslänge automatisch aus dem Verlauf berechnen<small id="autoHint"></small></span></label>
-      <div class="row" style="margin-top:18px"><button id="pNew">+ Weitere Person</button><button class="danger ghost" id="pDel">Person entfernen</button></div>
+      <div class="row" style="margin-top:18px"><button class="danger ghost" id="pDel">Person entfernen</button></div>
+     </div>
     </div>
 
     <div class="card">
@@ -394,7 +410,7 @@ function migrate(o){
 }
 let canSave=true;
 function load(){try{const r=localStorage.getItem(KEY);return migrate(r&&JSON.parse(r))}catch(e){canSave=false;return fresh()}}
-let S=load(),adding=false,lastFix=null;
+let S=load(),adding=false,lastFix=null,setMode=null,editId=null;
 const P=()=>S.persons.find(p=>p.id===S.active)||S.persons[0];
 
 // IndexedDB-Spiegel für den Service Worker
@@ -474,7 +490,7 @@ function ringSVG(p,day,len){
  h+=`<circle cx="${mx}" cy="${my}" r="19" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/><circle cx="${mx}" cy="${my}" r="8" fill="var(--${phase(day,len,p.period)})"/>`;
  return `<svg viewBox="0 0 320 320" role="img" aria-label="Zyklus-Rad, Tag ${day} von ${len}">${h}</svg>`;
 }
-function renderSetup(v,p,isNew){
+function renderSetup(v,p,isNew,onDone){
  const T=T0();
  v.innerHTML=`<div class="setup"><h2>${isNew?'Neue Person':'Willkommen bei Luna'}</h2>
   <p class="lead">Einmal den ersten Tag der letzten Periode eintragen – ab dann zeigt Luna jeden Tag, in welcher Phase sie ist und was als Nächstes kommt.</p>
@@ -492,8 +508,8 @@ function renderSetup(v,p,isNew){
   q.name=$('#iName').value.trim();q.rel=($('#iRel .on')||{}).dataset?.r||'partner';q.emoji=($('#iEmo .on')||{}).dataset?.e||'🌸';
   q.cycle=clamp(+$('#iCyc').value||28,20,45);q.period=clamp(+$('#iPer').value||5,2,10);
   if(isNew){S.persons.push(q);S.active=q.id}
-  adding=false;addStart(q,toN(d));save();toast('Gespeichert');render();scrollTo(0,0)};
- const c=$('#iCancel');if(c)c.onclick=()=>{adding=false;render()};
+  adding=false;addStart(q,toN(d));save();if(onDone)onDone();toast('Gespeichert');render();scrollTo(0,0)};
+ const c=$('#iCancel');if(c)c.onclick=()=>{adding=false;if(onDone)onDone();render()};
 }
 function calBanner(){
  if(!S.persons.some(p=>p.starts.length))return'';
@@ -694,8 +710,14 @@ $('#nTest').onclick=async()=>{try{const r=await navigator.serviceWorker.ready;co
  await r.showNotification(title,{body,icon:'icons/icon-192.png',tag:key});inbox=(await idbGet('inbox'))||[];inbox.unshift({key,title,body,ts:Date.now(),read:false});await idbSet('inbox',inbox);renderInbox()}catch(e){toast('Test hat nicht geklappt')}};
 document.querySelectorAll('input[data-n]').forEach(c=>c.onchange=()=>{S.notify[c.dataset.n]=c.checked;save()});
 
+const E=()=>S.persons.find(x=>x.id===editId)||P();
 function renderSet(){
- const p=P();
+ const T=T0(),mode=setMode==='edit'&&!S.persons.some(x=>x.id===editId)?null:setMode;
+ $('#pList').hidden=!!mode;$('#pEdit').hidden=mode!=='edit';$('#pAddBox').hidden=mode!=='add';
+ $('#pRows').innerHTML=S.persons.map(x=>{const i=x.starts.length?info(x,T,T):null;
+  return `<li><button data-pe="${x.id}"><span class="em">${esc(x.emoji)}</span><span class="pi"><b>${esc(pname(x))}</b><small>${x.rel==='family'?'Familie / andere':'Partnerin'}${i?` · <i style="background:var(--${i.ph})"></i>${phN(x,i.ph)}`:''}</small></span><span class="go" aria-hidden="true">›</span></button></li>`}).join('');
+ if(mode==='add'&&!$('#pAddBox').innerHTML)renderSetup($('#pAddBox'),null,true,()=>{setMode=null;$('#pAddBox').innerHTML=''});
+ const p=E();
  $('#pTitle').textContent=p.name?`${p.emoji} ${p.name}`:'Person';
  $('#pName').value=p.name;$('#pEmo').innerHTML=emoGrid(p.emoji);
  $('#pRel').querySelectorAll('button').forEach(b=>{const on=b.dataset.r===p.rel;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
@@ -707,13 +729,15 @@ function renderSet(){
  $('#calNeutral').checked=S.cal.neutral;$('#calAll').checked=S.cal.all;$('#calAll').closest('label').hidden=S.persons.length<2;
  renderNotify();
 }
-$('#pName').onchange=e=>{P().name=e.target.value.trim();save();render();toast('Gespeichert')};
-$('#pRel').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;P().rel=b.dataset.r;save();render();toast(b.dataset.r==='family'?'Ohne Lust, Sex und fruchtbare Tage':'Als Partnerin')};
-$('#pEmo').onclick=e=>{const b=e.target.closest('[data-e]');if(!b)return;P().emoji=b.dataset.e;save();render()};
-$('#sCyc').onchange=e=>{P().cycle=clamp(+e.target.value||28,20,45);save();render();toast('Gespeichert')};
-$('#sPer').onchange=e=>{P().period=clamp(+e.target.value||5,2,10);save();render();toast('Gespeichert')};
-$('#sAuto').onchange=e=>{P().auto=e.target.checked;save();render()};
-$('#pDel').onclick=e=>twoStep(e.target,'Person entfernen','Wirklich entfernen?',()=>{S.persons=S.persons.filter(p=>p.id!==S.active);S.active=S.persons[0].id;save();sel=null;render();toast('Person entfernt')});
+$('#pName').onchange=e=>{E().name=e.target.value.trim();save();render();toast('Gespeichert')};
+$('#pRel').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;E().rel=b.dataset.r;save();render();toast(b.dataset.r==='family'?'Ohne Lust, Sex und fruchtbare Tage':'Als Partnerin')};
+$('#pEmo').onclick=e=>{const b=e.target.closest('[data-e]');if(!b)return;E().emoji=b.dataset.e;save();render()};
+$('#sCyc').onchange=e=>{E().cycle=clamp(+e.target.value||28,20,45);save();render();toast('Gespeichert')};
+$('#sPer').onchange=e=>{E().period=clamp(+e.target.value||5,2,10);save();render();toast('Gespeichert')};
+$('#sAuto').onchange=e=>{E().auto=e.target.checked;save();render()};
+$('#pDel').onclick=e=>twoStep(e.target,'Person entfernen','Wirklich entfernen?',()=>{const id=E().id;S.persons=S.persons.filter(p=>p.id!==id);if(S.active===id)S.active=S.persons[0].id;setMode=null;save();sel=null;render();toast('Person entfernt')});
+$('#pRows').onclick=e=>{const b=e.target.closest('[data-pe]');if(!b)return;editId=b.dataset.pe;setMode='edit';renderSet();$('#pCard').scrollIntoView({block:'start'})};
+$('#pBack').onclick=()=>{setMode=null;renderSet()};
 $('#calNeutral').onchange=e=>{S.cal.neutral=e.target.checked;save()};
 $('#calAll').onchange=e=>{S.cal.all=e.target.checked;save()};
 
@@ -780,7 +804,7 @@ $('#impBtn').onclick=()=>{try{const o=JSON.parse($('#imp').value),d=o.data||o;
  const ok=x=>Array.isArray(x.starts)&&x.starts.every(s=>/^\d{4}-\d{2}-\d{2}$/.test(s));
  if(d.persons?!d.persons.length||!d.persons.every(ok):!ok(d))throw 0;
  S=migrate(d);save();$('#imp').value='';sel=null;render();toast('Backup wiederhergestellt')}catch(e){toast('Das sieht nicht nach einem gültigen Backup aus')}};
-$('#pNew').onclick=()=>{adding=true;sel=null;location.hash='#heute';render()};
+$('#pNew').onclick=()=>{setMode='add';$('#pAddBox').innerHTML='';renderSet();const n=$('#iName');if(n)n.focus()};
 $('#rstBtn').onclick=e=>twoStep(e.target,'Alle Daten löschen','Wirklich alles löschen?',()=>{S=fresh();save();sel=null;adding=false;render();location.hash='#heute';toast('Alles gelöscht')});
 
 
@@ -861,6 +885,7 @@ if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('messag
 /* ---------- Routing ---------- */
 const VIEWS=['heute','kalender','wissen','verlauf','einstellungen','mitteilungen'];
 function route(){const h=location.hash.slice(1),v=VIEWS.includes(h)?h:'heute';
+ if(v!=='einstellungen'&&setMode){setMode=null;$('#pAddBox').innerHTML='';renderSet()}
  VIEWS.forEach(x=>{$('#v-'+x).classList.toggle('on',x===v);const a=document.querySelector(`nav a[data-v=${x}]`);if(a)a.classList.toggle('on',x===v)});
  $('#bell').classList.toggle('on',v==='mitteilungen');$('#gear').classList.toggle('on',v==='einstellungen');if(v==='mitteilungen')loadInbox();
  if(v==='wissen'){drawHorm();if(wantScroll){const el=$('#wi-'+wantScroll);wantScroll=null;if(el)setTimeout(()=>el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),60)}}else scrollTo(0,0)}
