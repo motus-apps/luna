@@ -146,6 +146,9 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
 .season.now{box-shadow:0 0 0 2px var(--pc)}
 .season .now-tag{position:absolute;top:14px;right:14px;font-size:13px;font-weight:600;color:var(--bg);background:var(--pc);padding:3px 10px;border-radius:999px}
 .season svg.ill{width:84px;height:84px;display:block}
+.season .pic{display:block;width:calc(100% + 40px);max-width:none;margin:-18px -20px 14px;aspect-ratio:4/3;object-fit:cover;border-radius:16px 16px 0 0;background:color-mix(in srgb,var(--pc) 14%,var(--card))}
+.season .pic+svg.ill{display:none}
+.wi-hero{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:22px;margin:0 0 14px;background:var(--card)}
 .season h3{margin-top:8px}.season .sub{color:var(--pc);font-weight:600;font-size:15px}
 .season dl{margin:12px 0 0;display:grid;gap:10px}
 .season dt{font-size:13px;font-weight:600;color:var(--mut)}
@@ -557,6 +560,11 @@ const CALT={period:['Periode erwartet','🌙','Wärmflasche, Tee und Periodenpro
  fert:['Fruchtbare Tage – verhüten','🔶','Schwangerschaft möglich. Kein Kinderwunsch: nur mit sicherer Verhütung. Die Rechnung ist eine Schätzung.',480],
  mood:['Hochphase ✨','☀️','Oft besonders gute Laune und viel Energie – Zeit für ein Date.',480],
  pms:['Emotionale Tage (PMS)','🌧️','Extra Geduld, nichts persönlich nehmen, Lieblingssnack besorgen.',-600]};
+// Zeilen nach RFC 5545 auf max. 75 Byte umbrechen (Folgezeilen beginnen mit Leerzeichen), ohne Zeichen zu zerteilen
+function fold(l){const enc=new TextEncoder();if(enc.encode(l).length<=75)return l;
+ const out=[];let cur='',n=0,max=75;
+ for(const ch of l){const b=enc.encode(ch).length;if(n+b>max){out.push(cur);cur=' ';n=1;max=75}cur+=ch;n+=b}
+ out.push(cur);return out.join('\r\n')}
 function ics(seq=S.cal.seq){
  const T=T0(),list=S.cal.all?S.persons:[P()],d8=n=>toS(n).replace(/-/g,''),stamp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
  const icEsc=s=>s.replace(/[\\,;]/g,m=>'\\'+m).replace(/\n/g,'\\n');
@@ -569,10 +577,10 @@ function ics(seq=S.cal.seq){
    L.push('BEGIN:VEVENT',`UID:luna-${p.id}-${x.type}-${x.c}@luna`,`DTSTAMP:${stamp}`,`SEQUENCE:${seq}`,`DTSTART;VALUE=DATE:${d8(x.from)}`,`DTEND;VALUE=DATE:${d8(x.to+1)}`,
     `SUMMARY:${icEsc(title)}`,...(S.cal.neutral?[]:[`DESCRIPTION:${icEsc(desc)}`]),'TRANSP:TRANSPARENT',
     'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${icEsc(title)}`,`TRIGGER:${trig}`,'END:VALARM','END:VEVENT');cnt++}}
- L.push('END:VCALENDAR');return cnt?L.join('\r\n'):null;
+ L.push('END:VCALENDAR');return cnt?L.map(fold).join('\r\n'):null;
 }
 // Fingerabdruck der Termine (ohne Zeitstempel/Version), um Änderungen zu erkennen
-function calHash(){const t=ics(0);if(!t)return'';const b=t.split('\r\n').filter(l=>!/^(DTSTAMP|SEQUENCE)/.test(l)).join('|');let h=5381;for(let i=0;i<b.length;i++)h=(h*33^b.charCodeAt(i))>>>0;return h.toString(36)}
+function calHash(){const t=ics(0);if(!t)return'';const b=t.replace(/\r\n /g,'').split('\r\n').filter(l=>!/^(DTSTAMP|SEQUENCE)/.test(l)).join('|');let h=5381;for(let i=0;i<b.length;i++)h=(h*33^b.charCodeAt(i))>>>0;return h.toString(36)}
 async function exportCal(){
  const seq=S.cal.seq+1,txt=ics(seq);if(!txt){toast('Noch keine Daten zum Exportieren');return}
  const done=()=>{S.cal.seq=seq;S.cal.hash=calHash();save();render()};
@@ -583,6 +591,23 @@ async function exportCal(){
 }
 $('#calBtn').onclick=exportCal;
 $('#calOn').onchange=e=>{S.cal.on=e.target.checked;if(S.cal.on)S.cal.dismissed=true;save();render()};
+
+// Erklärbilder im Wissen-Bereich (Dateien in img/wissen/, siehe docs/bilder.md).
+// Erst eintragen, wenn die Datei wirklich im Ordner liegt – bis dahin bleiben die gezeichneten Grafiken.
+const BILDER={
+ // hero:'zyklus.webp',
+ // 'wi-winter':'periode.webp',
+ // 'wi-fruehling':'follikel.webp',
+ // 'wi-sommer':'eisprung.webp',
+ // 'wi-herbst':'luteal.webp',
+};
+(function(){
+ const img=(f,cls)=>{const i=document.createElement('img');i.src='img/wissen/'+f;i.alt='';i.className=cls;i.loading='lazy';i.decoding='async';i.onerror=()=>i.remove();return i};
+ for(const [k,f] of Object.entries(BILDER)){
+  if(k==='hero'){const l=$('.wi-lead');if(l)l.after(img(f,'wi-hero'));continue}
+  const a=document.getElementById(k);if(a)a.prepend(img(f,'pic'));
+ }
+})();
 
 // Backup
 const backup=()=>JSON.stringify({app:'luna',v:2,data:S});
