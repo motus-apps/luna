@@ -82,11 +82,20 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .evl label.yr{display:inline-flex;align-items:center;gap:6px;margin:4px 0 0;font-weight:500;font-size:13px;color:var(--mut);cursor:pointer;min-height:32px}
 .evl label.yr input{width:16px;height:16px;margin:0;accent-color:var(--pc)}
 .evl button{min-height:44px;width:44px;padding:0;flex:none;border:0}
-.next li i.ev{width:auto;height:auto;background:none;font-style:normal;font-size:15px}
+.next li i{margin:0 4px}.next li i.ev{width:18px;height:auto;margin:0;background:none;font-style:normal;font-size:15px;text-align:center}
 .mu{margin-top:24px}.mu ul{list-style:none;padding:0;margin:14px 0;display:grid;gap:14px}
 .mh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin-bottom:6px}.mh span{color:var(--mut);font-size:14px}
 .mbar{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
 .ideas li{border-left:3px solid var(--fert);padding:2px 0 2px 12px}.ideas p{margin:2px 0 0}.ideas small{color:var(--mut)}
+.tip{margin-top:16px;padding:14px 18px;border-radius:18px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pc)}
+.tip b{font-size:13px;color:var(--mut);font-weight:600}.tip p{margin:4px 0 0;font-size:16px;line-height:1.45}.tip .more{font-size:14px;display:inline-block;margin-top:6px}
+.idc{margin-bottom:20px}.idrow{margin-top:10px;flex-wrap:nowrap}.idrow input{flex:1;min-width:0}
+.idl{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+.idl li{display:flex;align-items:center;gap:10px;padding:4px 4px 4px 12px;border:1px solid var(--line);border-radius:14px}
+.idl .em{font-size:20px}.idl .tx{flex:1;min-width:0;overflow-wrap:anywhere}.idl button{min-height:44px;width:44px;padding:0;border:0;flex:none}
+.idl li.done .tx{text-decoration:line-through;color:var(--mut)}
+.iddone{margin-top:12px}.iddone summary{cursor:pointer;color:var(--mut);font-size:14px;min-height:32px}
+.revl{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}.revl small{color:var(--mut)}.revl p{margin:2px 0 0}
 .week{margin-top:32px}.week h3{margin-bottom:12px}
 .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .days div{display:grid;justify-items:center;gap:6px}
@@ -347,6 +356,8 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
 
 <section class="view" id="v-verlauf">
   <h2 id="histTitle">Verlauf</h2>
+  <div class="card idc" id="ideas"></div>
+  <div id="revCard"></div>
   <div class="stats" id="stats"></div>
   <ul class="hist" id="hist"></ul>
   <div id="muster"></div>
@@ -390,6 +401,7 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
       <label class="chk"><input type="checkbox" data-n="fert"><span>Fruchtbare Tage – verhüten<small>Am ersten Tag des fruchtbaren Fensters</small></span></label>
       <label class="chk"><input type="checkbox" data-n="buffer"><span>Sicherheitspuffer für die fruchtbaren Tage<small>Fenster 3 Tage früher beginnen und 2 Tage später enden lassen</small></span></label>
       <label class="chk"><input type="checkbox" data-n="mood"><span>Hochphase – sehr gute Laune<small>Kurz vor dem Eisprung</small></span></label>
+      <label class="chk"><input type="checkbox" data-n="ev"><span>Geburtstage, Jahrestage & Termine<small>Eine Woche vorher, am Vortag und am Tag selbst – mit Hinweis zur Phase</small></span></label>
       <label class="chk"><input type="checkbox" data-n="period"><span>Periode<small>Am Vortag und am erwarteten Tag</small></span></label>
     </div>
 
@@ -433,13 +445,13 @@ const inDays=d=>d===0?'heute':d===1?'morgen':d===-1?'gestern':d>0?`in ${d} Tagen
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,Math.round(x)));
 const uid=()=>Math.random().toString(36).slice(2,9);
 const EMO=['🌸','🌙','🌷','🦋','✨','💜','🌻','🍓','🌊','🌿','☀️','🔥','💐','👑','🐱','🍒'];
-const person=(o={})=>({id:uid(),name:'',emoji:'🌸',starts:[],cycle:28,period:5,auto:true,notes:{},events:[],rel:'partner',...o});
-const fresh=()=>{const p=person();return{v:2,persons:[p],active:p.id,notify:{on:false,pms:true,fert:true,buffer:true,mood:true,period:true},cal:{on:false,dismissed:false,neutral:false,all:true,seq:0,hash:''}}};
+const person=(o={})=>({id:uid(),name:'',emoji:'🌸',starts:[],cycle:28,period:5,auto:true,notes:{},events:[],ideas:[],rel:'partner',...o});
+const fresh=()=>{const p=person();return{v:2,persons:[p],active:p.id,notify:{on:false,ev:true,pms:true,fert:true,buffer:true,mood:true,period:true},cal:{on:false,dismissed:false,neutral:false,all:true,seq:0,hash:''}}};
 function migrate(o){
  if(!o)return fresh();
  if(!o.persons){const p=person({starts:o.starts||[],cycle:o.cycle||28,period:o.period||5,auto:o.auto!==false,notes:o.notes||{}});const f=fresh();f.persons=[p];f.active=p.id;return f}
  const f=fresh(),r={...f,...o,notify:{...f.notify,...o.notify},cal:{...f.cal,...o.cal}};
- r.persons.forEach(p=>{if(!Array.isArray(p.events))p.events=[];if(!p.notes)p.notes={};if(p.rel!=='family')p.rel='partner'});
+ r.persons.forEach(p=>{if(!Array.isArray(p.events))p.events=[];if(!Array.isArray(p.ideas))p.ideas=[];if(!p.notes)p.notes={};if(p.rel!=='family')p.rel='partner'});
  return r;
 }
 let canSave=true;
@@ -480,15 +492,55 @@ const BEL={mens:2,foll:4,fert:4,ovu:5,lut:3,pms:1,late:3};
 const YOUF={...YOU,
  fert:{m:YOU.fert.m,s:'Rund um den Eisprung haben viele die meiste Energie und sind besonders gesellig.',ok:['Etwas zusammen unternehmen','Gute Zeit, um Pläne zu besprechen','Raum für Freunde und Aktivitäten lassen'],no:['Mit Pflichten ausbremsen']},
  ovu:{m:YOU.ovu.m,s:'Rechnerisch der Eisprung: Östrogen ist am Höchststand, für viele der Tag mit der meisten Energie.',ok:['Gute Tage für wichtige Gespräche und Pläne','Zusammen etwas erleben'],no:['Wichtige Gespräche auf die Tage vor der Periode schieben']}};
+const TIPS={
+ mens:[['Krämpfe entstehen durch Prostaglandine – Botenstoffe, die die Gebärmutter zusammenziehen lassen. Wärme entspannt die Muskulatur.'],
+  ['Der Blutverlust kann müde machen. Das ist körperlich, keine Faulheit.'],
+  ['Leichte Bewegung wie ein Spaziergang kann Regelschmerzen lindern – wenn sie Lust drauf hat.'],
+  ['Die Prostaglandine wirken auch auf den Darm – Bauchgrummeln ist in diesen Tagen häufig.'],
+  ['Viele schlafen in den ersten Periodentagen schlechter. Ein ruhiger Abend hilft mehr als jede Unternehmung.']],
+ foll:[['Steigendes Östrogen wirkt auf Botenstoffe wie Serotonin – viele fühlen sich jetzt ausgeglichener und motivierter.'],
+  ['Die Follikelphase ist der flexible Teil des Zyklus: Ist ein Zyklus länger, dauert vor allem sie länger.'],
+  ['Viele berichten, dass Sport ihnen jetzt besonders leicht fällt.'],
+  ['Gute Zeit für Gespräche über Pläne: Viele sind jetzt offen für Neues.']],
+ fert:[['Das Ei lebt nach dem Eisprung nur etwa 12 bis 24 Stunden.',1],
+  ['Manche spüren den Eisprung als leichtes Ziehen auf einer Seite des Unterbauchs – den „Mittelschmerz“.'],
+  ['Rund um den Eisprung steigt bei vielen die Lust – das ist biologisch gut belegt.',1],
+  ['Nach dem Eisprung steigt die Körpertemperatur um etwa 0,2 bis 0,5 °C – darauf beruht die Temperaturmethode.'],
+  ['Östrogen ist jetzt am Höchststand: Viele fühlen sich besonders selbstbewusst und gesellig.']],
+ lut:[['Progesteron wirkt leicht beruhigend und macht viele schneller müde. Früher ins Bett ist keine Laune, sondern Biologie.'],
+  ['Die Lutealphase dauert meist recht konstant etwa 12 bis 14 Tage.'],
+  ['Die leicht erhöhte Körpertemperatur in dieser Phase kann den Schlaf unruhiger machen.'],
+  ['Viele haben jetzt mehr Appetit – der Energiebedarf steigt tatsächlich leicht.']],
+ pms:[['Wenn Östrogen und Progesteron fallen, sinkt bei vielen auch Serotonin – das kann Reizbarkeit und Traurigkeit erklären.'],
+  ['Brustspannen vor der Periode ist häufig und hormonell bedingt.'],
+  ['Wassereinlagerungen vor der Periode sind normal – ein, zwei Kilo mehr auf der Waage sind oft nur Wasser.'],
+  ['Bei sehr starkem PMS (PMDS) gibt es gute ärztliche Hilfe – das muss niemand einfach aushalten.'],
+  ['Wenn es knirscht: erst mal durchatmen. Viele Streits aus diesen Tagen fühlen sich eine Woche später ganz anders an.']]
+};
+TIPS.ovu=TIPS.fert;TIPS.late=TIPS.lut;
+function tipOf(p,ph,T){const l=TIPS[ph].filter(t=>!(t[1]&&fam(p)));return l[T%l.length][0]}
+// Ideen-Liste pro Person
+const IDT={gift:['🎁','Geschenk'],food:['🍫','Essen & Snacks'],place:['📍','Ausflug & Restaurant'],misc:['💬','Sonstiges']};
+// Rückblick: einmalige Ereignisse in den letzten Zyklen
+function reviews(p,T,max=3){const inf=info(p,T,T);if(!inf)return[];const out=[];let s=inf.s;
+ for(let k=0;k<max;k++){const pi=info(p,s-1,T);if(!pi)break;const a=pi.s,e=s-1;
+  const es=(p.events||[]).filter(x=>EVT[x.t]&&!yearly(x)&&x.t!=='sonst'&&toN(x.d)>=a&&toN(x.d)<=e);
+  if(es.length)out.push({a,e,es});s=a}
+ return out}
+function reviewLine(p,r,T){
+ const order=['schoen','sex','streit','idee'].filter(t=>!(t==='sex'&&fam(p)));
+ const parts=order.map(t=>{const n=r.es.filter(x=>x.t===t).length;return n?`${EVT[t][0]} ${n}× ${EVT[t][1]}`:''}).filter(Boolean);
+ const st=r.es.filter(x=>x.t==='streit').map(x=>info(p,toN(x.d),T)).filter(Boolean);
+ let where='';if(st.length){const g=GRP.map(g=>st.filter(i=>g[2].includes(i.ph)).length),m=Math.max(...g);where=` · ${st.length===1?'Streit':'Streit vor allem'}: ${GRP[g.indexOf(m)][1]}`}
+ return parts.join(' · ')+where}
 const LEG=[['mens','Periode'],['foll','Follikelphase'],['fert','Fruchtbar'],['ovu','Eisprung'],['lut','Lutealphase'],['pms','Vor der Periode']];
 // Optionale Ereignisse im Kalender: [Emoji, Name, Platzhalter für die Notiz, jährlich wiederkehrend]
 const EVT={geb:['🎂','Geburtstag','Wessen Geburtstag?',1],jt:['💍','Jahrestag','z. B. Zusammenkommen, erstes Date',1],hz:['💒','Hochzeitstag','z. B. Standesamt oder Kirche',1],sex:['❤️','Sex','',0],streit:['⚡','Streit','Worum ging’s?',0],
  schoen:['✨','Schöner Moment','Was war schön?',0],idee:['💡','Erkenntnis','Was hast du verstanden?',0],sonst:['📌','Sonstiges','Was steht an?',0]};
 // jährlich wiederkehrend: pro Eintrag einstellbar (e.y), sonst Vorgabe des Typs
-const yearly=e=>e.y!==undefined?!!e.y:!!EVT[e.t][3];
+const yearly=C.yearly;
 // Ereignisse an Tag n (jährliche ab dem eingetragenen Datum jedes Jahr am selben Tag)
-function evOn(p,n){const k=toS(n);return (p.events||[]).filter(e=>EVT[e.t]&&(e.d===k||(yearly(e)&&e.d.slice(4)===k.slice(4)&&e.d<k)))}
-function evYears(e,n){const y=+toS(n).slice(0,4)-+e.d.slice(0,4);if(y<=0)return'';return e.t==='geb'?`wird ${y}`:`${y} ${y===1?'Jahr':'Jahre'}`}
+const evOn=C.evOn,evYears=C.evYears;
 const evLabel=(e,n)=>{const v=EVT[e.t],y=yearly(e)?evYears(e,n):'';return `${v[1]}${e.x?' · '+esc(e.x):''}${y?' · '+y:''}`};
 const SYM=['Krämpfe','Kopfweh','Müde','Gereizt','Heißhunger','Empfindlich','Gut drauf','Viel Energie'];
 const legend=()=>LEG.map(([k,n])=>`<span><i style="background:var(--${k})"></i>${n}</span>`).join('');
@@ -588,6 +640,8 @@ function renderToday(){
   for(const e of evOn(p,n))changes.push(`<li><i class="ev" aria-hidden="true">${EVT[e.t][0]}</i><b>${dl}</b><span>${evLabel(e,n)}</span></li>`);
   if(k&&phk!==prev)changes.push(`<li style="--pc:var(--${phk})"><i></i><b>${dl}</b><span>${phk==='mens'?'Periode erwartet':phN(p,phk)}</span></li>`);
   prev=phk}
+ {const gifts=(p.ideas||[]).filter(i=>i.t==='gift'&&!i.done).length,occ=[0,1,2,3,4,5,6].some(k=>evOn(p,T+k).some(e=>['geb','jt','hz'].includes(e.t)));
+  if(gifts&&occ)changes.push(`<li><i class="ev" aria-hidden="true">🎁</i><b>Ideen</b><span><a class="more" href="#verlauf">${gifts} ${gifts===1?'Geschenkidee':'Geschenkideen'} notiert</a></span></li>`)}
  const cards=[
   ['Nächste Periode',late?'überfällig':inDays(ns.n-T),late?`seit ${pl(ns.late,'Tag','Tagen')}`:wd(ns.n)],
   ['Fruchtbares Fenster',T>=fs&&T<=fe?'jetzt':inDays(fs-T),`${fmt(fs,{day:'numeric',month:'short'})} – ${fmt(fe,{day:'numeric',month:'short'})}`],
@@ -607,6 +661,8 @@ function renderToday(){
   <p class="body-note"><b>Im Körper:</b> ${ph.t} <a class="more" href="#wissen" id="moreLink">Mehr dazu</a></p>
   ${quiet}
  </article>
+ <div class="tip" style="--pc:var(--${inf.ph})"><b>Gut zu wissen</b><p>${tipOf(p,inf.ph,T)}</p></div>
+ ${(()=>{if(inf.day>5)return'';const r=reviews(p,T,1)[0];if(!r||r.e!==inf.s-1)return'';return `<div class="tip rev" style="--pc:var(--lut)"><b>Rückblick letzter Zyklus</b><p>${reviewLine(p,r,T)}</p><a class="more" href="#verlauf">Mehr im Verlauf</a></div>`})()}
  <div class="week"><h3>Die nächsten 7 Tage</h3><div class="days">${days.join('')}</div>
   <ul class="next">${changes.slice(0,6).join('')||`<li style="--pc:var(--${inf.ph})"><i></i><span>${ph.n} geht die ganze Woche weiter</span></li>`}</ul></div>
  <div class="grid">${cards.map(c=>`<div class="card"><small>${c[0]}</small><strong>${c[1]}</strong><span>${c[2]}</span></div>`).join('')}</div>
@@ -693,8 +749,29 @@ function renderHist(){
   const kz=len?C.parts(len,p):1;
   return `<li><b>${fmt(n,{day:'numeric',month:'short',year:'numeric'})}</b><div class="bar"><i style="width:${Math.min(100,(len?len/kz:Math.min(T-n+1,avg(p)))/mx*100).toFixed(1)}%;opacity:${len?1:.4}"></i></div><span>${len?(kz>1?`${len} Tage · ≈ ${kz} Zyklen`:len+' Tage'):'seitdem weitergerechnet'}</span><button class="ghost danger" data-d="${toS(n)}" aria-label="Eintrag ${fmt(n)} löschen">Löschen</button></li>`}).reverse().join('')
   :'<li><span>Noch keine Einträge.</span></li>';
- renderMuster(p,T);
+ renderMuster(p,T);renderIdeas(p);
+ const rv=reviews(p,T,3);
+ $('#revCard').innerHTML=rv.length?`<div class="card mu"><h3>Rückblick</h3><ul class="revl">${rv.map(r=>`<li><small>${fmt(r.a,{day:'numeric',month:'short'})} – ${fmt(r.e,{day:'numeric',month:'short'})}</small><p>${reviewLine(p,r,T)}</p></li>`).join('')}</ul></div>`:'';
 }
+let ideaT='gift';
+function renderIdeas(p){
+ const open=p.ideas.filter(i=>!i.done),done=p.ideas.filter(i=>i.done);
+ const li=i=>`<li class="${i.done?'done':''}"><span class="em" aria-hidden="true">${IDT[i.t][0]}</span><span class="tx">${esc(i.x)}</span>
+  <button class="ghost" data-ido="${i.id}" aria-label="${i.done?'Wieder offen':'Erledigt'}" title="${i.done?'Wieder offen':'Erledigt'}">${i.done?'↺':'✓'}</button><button class="ghost" data-idd="${i.id}" aria-label="Löschen">✕</button></li>`;
+ $('#ideas').innerHTML=`<h3>Ideen für ${p.name?esc(p.name):'sie'}</h3><p class="hint">Was sie nebenbei erwähnt – damit es beim nächsten Anlass parat ist.</p>
+  <div class="chips" id="ideaType" style="margin-top:12px">${Object.entries(IDT).map(([k,v])=>`<button data-it="${k}" class="${k===ideaT?'on':''}" aria-pressed="${k===ideaT}">${v[0]} ${v[1]}</button>`).join('')}</div>
+  <div class="row idrow"><input type="text" id="ideaTxt" maxlength="120" placeholder="z. B. Kopfhörer, Lieblingsschokolade, das Thai-Restaurant …" aria-label="Neue Idee"><button id="ideaAdd">Merken</button></div>
+  ${open.length?`<ul class="idl">${open.map(li).join('')}</ul>`:''}
+  ${done.length?`<details class="iddone"><summary>Erledigt (${done.length})</summary><ul class="idl">${done.map(li).join('')}</ul></details>`:''}`;
+}
+$('#ideas').onclick=e=>{const p=P(),t=e.target.closest('[data-it]'),o=e.target.closest('[data-ido]'),d=e.target.closest('[data-idd]');
+ if(t){ideaT=t.dataset.it;const v=$('#ideaTxt').value;renderIdeas(p);$('#ideaTxt').value=v;$('#ideaTxt').focus();return}
+ if(o){const i=p.ideas.find(x=>x.id===o.dataset.ido);if(i){i.done=!i.done;save();render();toast(i.done?'Erledigt – stark!':'Wieder offen')}return}
+ if(d){p.ideas=p.ideas.filter(x=>x.id!==d.dataset.idd);save();render();toast('Gelöscht');return}
+ if(e.target.id==='ideaAdd')addIdea()};
+$('#ideas').addEventListener('keydown',e=>{if(e.target.id==='ideaTxt'&&e.key==='Enter'){e.preventDefault();addIdea()}});
+function addIdea(){const p=P(),x=$('#ideaTxt').value.trim();if(!x){$('#ideaTxt').focus();return}
+ p.ideas.unshift({id:uid(),t:ideaT,x,ts:Date.now(),done:false});save();render();$('#ideaTxt').focus();toast(IDT[ideaT][0]+' Gemerkt')}
 // Muster: in welchen Phasen lagen Ereignisse? Nur sichtbar, wenn es Einträge gibt – nichts wird abgefragt.
 const GRP=[['mens','Periode',['mens']],['foll','Follikelphase',['foll']],['fert','Fruchtbare Tage',['fert','ovu']],['lut','Lutealphase',['lut']],['pms','Vor der Periode',['pms']]];
 function renderMuster(p,T){

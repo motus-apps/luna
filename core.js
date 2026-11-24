@@ -72,10 +72,52 @@
     return [Math.max(P + 1, buffer ? o - 8 : o - 5), buffer ? o + 3 : o + 1];
   };
 
+  // Ereignisse (optional im Kalender festgehalten); jährlich je Eintrag einstellbar, sonst Vorgabe des Typs
+  const EVN = { geb: ['🎂', 'Geburtstag'], jt: ['💍', 'Jahrestag'], hz: ['💒', 'Hochzeitstag'], sex: ['❤️', 'Sex'], streit: ['⚡', 'Streit'], schoen: ['✨', 'Schöner Moment'], idee: ['💡', 'Erkenntnis'], sonst: ['📌', 'Termin'] };
+  const EVY = { geb: 1, jt: 1, hz: 1 };
+  const yearly = e => e.y !== undefined ? !!e.y : !!EVY[e.t];
+  function evOn(p, n) {
+    const k = toS(n);
+    return (p.events || []).filter(e => EVN[e.t] && (e.d === k || (yearly(e) && e.d.slice(4) === k.slice(4) && e.d < k)));
+  }
+  function evYears(e, n) {
+    const y = +toS(n).slice(0, 4) - +e.d.slice(0, 4);
+    if (y <= 0) return '';
+    return e.t === 'geb' ? `wird ${y}` : `${y} ${y === 1 ? 'Jahr' : 'Jahre'}`;
+  }
+  const PHHINT = {
+    mens: 'Fällt in die Periode – Programm lieber locker planen.',
+    foll: 'Liegt in einer Phase mit viel Energie – gute Zeit für etwas Besonderes.',
+    fert: 'Liegt in den energiereichsten Tagen – perfekt für etwas Besonderes.',
+    ovu: 'Liegt in den energiereichsten Tagen – perfekt für etwas Besonderes.',
+    lut: 'Liegt in einer ruhigeren Phase – gemütlich schlägt Großprogramm.',
+    pms: 'Liegt in den Tagen vor der Periode – eher ruhiger Abend als großes Programm.'
+  };
+  // Erinnerungen an jährliche Ereignisse und geplante Termine: 7 Tage vorher, am Vortag, am Tag selbst
+  function reminders(p, T, o) {
+    if (o.ev === false) return [];
+    const out = [], gifts = (p.ideas || []).filter(i => i.t === 'gift' && !i.done).length;
+    for (const [d, when] of [[7, 'in einer Woche'], [1, 'morgen'], [0, 'heute']]) {
+      const n = T + d;
+      for (const e of evOn(p, n)) {
+        if (!yearly(e) && e.t !== 'sonst') continue;
+        const [em, name] = EVN[e.t], y = yearly(e) ? evYears(e, n) : '';
+        const inf = (p.starts || []).length ? info(p, n, T) : null;
+        let body = [y ? y.charAt(0).toUpperCase() + y.slice(1) + '.' : '', inf && yearly(e) && PHHINT[inf.ph] ? PHHINT[inf.ph] : ''].filter(Boolean).join(' ');
+        if (d > 0 && EVY[e.t] && gifts) body += ` Du hast ${gifts} ${gifts === 1 ? 'Geschenkidee' : 'Geschenkideen'} notiert.`;
+        out.push({ key: p.id + ':ev:' + e.id + ':' + toS(n) + ':' + d, type: 'ev', title: `${em} ${name}${e.x ? ' · ' + e.x : ''} ${when}`, body: body || 'Steht im Kalender von Luna.' });
+      }
+    }
+    return out;
+  }
+
   const who = p => ((p.emoji || '') + ' ' + (p.name || 'Luna')).trim();
 
   // Benachrichtigungen, die an Tag T für Person p fällig sind
   function events(p, T, o) {
+    return reminders(p, T, o).concat(cycleEvents(p, T, o));
+  }
+  function cycleEvents(p, T, o) {
     const st = starts(p);
     if (!st.length) return [];
     const out = [], last = st[st.length - 1], L = avg(p);
@@ -114,5 +156,5 @@
     return out.filter(x => x.to >= T);
   }
 
-  g.LunaCore = { DAY, toN, toS, T0, fmt, starts, parts, gaps, avg, phase, info, nextStart, events, spans, who };
+  g.LunaCore = { DAY, toN, toS, T0, fmt, starts, parts, gaps, EVN, yearly, evOn, evYears, reminders, avg, phase, info, nextStart, events, spans, who };
 })(typeof self !== 'undefined' ? self : this);
