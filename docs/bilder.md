@@ -1,7 +1,11 @@
 # Erklärbilder für den Wissen-Bereich
 
-Die Bilder werden mit ChatGPT im Browser erzeugt (wie bei 11kickers) und dann hier eingebaut.
-Solange ein Bild fehlt, zeigt Luna die gezeichnete Grafik – es geht also nichts kaputt.
+Die Erklärbilder sind als SVG direkt in `index.html` gezeichnet (Titelbild „Ein Zyklus auf einen Blick“
+und je ein Bild pro Phase, Klasse `art`). Sie nutzen die Phasenfarben der App und passen sich damit
+automatisch an hell/dunkel an, sind nur wenige KB groß und offline verfügbar.
+
+Optional lassen sich einzelne Bilder durch Raster-Bilder ersetzen, z. B. aus ChatGPT. Ein eingetragenes
+Bild verdrängt die Zeichnung; fehlt die Datei, bleibt die Zeichnung.
 
 ## Plätze und Dateinamen
 
