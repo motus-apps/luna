@@ -11,9 +11,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#120c16">
 <meta name="apple-mobile-web-app-title" content="Luna">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:Fraunces;font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/fraunces.woff2) format('woff2')}
+@font-face{font-family:Figtree;font-style:normal;font-weight:300 900;font-display:swap;src:url(fonts/figtree.woff2) format('woff2')}
 :root{color-scheme:light dark;
 --bg:light-dark(#fbf3f2,#171014);--card:light-dark(#fff,#21171c);--ink:light-dark(#2b1a20,#f5e9eb);
 --mut:light-dark(#7c666d,#b8a2a9);--line:light-dark(#efdfe1,#382930);
