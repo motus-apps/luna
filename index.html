@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luna</title>
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#120c16">
+<meta name="apple-mobile-web-app-title" content="Luna">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: tender, ruhig, privat – ein persönliches Werkzeug, kein Medizingerät
+   IDEA: ein Zyklus-Rad wie eine Mondscheibe, Tag für Tag als Segment
+   PICTURE: großes Ring-Diagramm mit Markierung des heutigen Tages
+   COLOUR and TYPE: Rosé-Grund, Beerenrot, Phasenfarben; Fraunces + Figtree
+   LAYOUT: Ring + Phasenkarte oben, darunter Prognosen; Tabs für Kalender, Verlauf, Einstellungen */
+:root{color-scheme:light dark;
+--bg:light-dark(#fbf3f2,#171014);--card:light-dark(#fff,#21171c);--ink:light-dark(#2b1a20,#f5e9eb);
+--mut:light-dark(#7c666d,#b8a2a9);--line:light-dark(#efdfe1,#382930);
+--mens:light-dark(#c42f4e,#e5566f);--foll:light-dark(#5f9c73,#7fbf91);--fert:light-dark(#d99a2b,#efb65a);
+--ovu:light-dark(#d4731f,#f29a45);--lut:light-dark(#8b78c0,#a894dd);--pms:light-dark(#6a59a6,#8e7dd0);--late:light-dark(#9b8a90,#8a787e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.08;margin:0;text-wrap:balance}
+h2{font-size:clamp(30px,5vw,44px)}h3{font-size:21px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 max(4vw,16px)}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:20px 0 8px}
+.brand{font:600 24px Fraunces,serif;display:flex;align-items:center;gap:10px}
+.brand img{border-radius:9px;display:block}
+nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;overflow-x:auto}
+nav a{flex:none;padding:9px 16px;border-radius:999px;color:var(--mut);text-decoration:none;font-weight:500;min-height:40px}
+nav a.on{background:var(--ink);color:var(--bg)}
+nav a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,.c:focus-visible{outline:3px solid var(--fert);outline-offset:2px}
+section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,4vw,56px);align-items:center}
+.ring{position:relative;width:min(100%,380px);aspect-ratio:1;margin:0 auto}
+.ring svg{position:absolute;inset:0;width:100%;height:100%}
+.ring .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.mid small{color:var(--mut);font-size:15px}.mid b{font:600 clamp(64px,14vw,96px)/1 Fraunces,serif;display:block}
+.tag{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;color:var(--pc)}
+.tag::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--pc)}
+.lead{font-size:17px;color:var(--mut);max-width:60ch;margin:14px 0 18px}
+ul.tips{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:8px}
+ul.tips li{padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;border-left:4px solid var(--pc)}
+button,.btn{font:600 16px Figtree,sans-serif;min-height:46px;padding:10px 20px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.pri{background:var(--mens);border-color:var(--mens);color:#fff}
+button.ghost{background:none}button:disabled{opacity:.5;cursor:default}
+button.danger{color:var(--mens)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px;margin-top:36px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px}
+.card small{color:var(--mut);display:block;font-size:14px}
+.card strong{font:600 24px/1.2 Fraunces,serif;display:block;margin:4px 0 2px}
+.card span{color:var(--mut);font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:14px;font-size:14px;color:var(--mut)}
+.legend span{display:flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:3px}
+.up{margin-top:36px}.up h3{margin-bottom:12px}
+.up ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.up li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.up li span{color:var(--mut);white-space:nowrap}
+.setup{max-width:520px}.setup .lead{margin-bottom:22px}
+label{display:block;font-weight:600;margin:16px 0 6px}
+input[type=date],input[type=number],textarea{font:16px Figtree,sans-serif;width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+.hint{color:var(--mut);font-size:14px;margin:6px 0 0}
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.calhead h2{font-size:clamp(26px,4vw,36px)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .wd{text-align:center;color:var(--mut);font-size:13px;padding-bottom:4px}
+.c{position:relative;aspect-ratio:1/1.05;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:500 16px Figtree,sans-serif;padding:0;min-height:44px;display:grid;place-items:center;cursor:pointer}
+.c.e{visibility:hidden}
+.c::after{content:"";position:absolute;left:22%;right:22%;bottom:6px;height:4px;border-radius:2px;background:var(--pc,transparent)}
+.c.p-mens{background:var(--mens);border-color:var(--mens);color:#fff}.c.p-mens::after{background:none}
+.c.p-mens.fut{background:color-mix(in srgb,var(--mens) 16%,var(--card));color:var(--ink);border:1.5px dashed var(--mens)}
+.c.p-fert,.c.p-ovu{background:color-mix(in srgb,var(--fert) 20%,var(--card))}
+.c.p-ovu{border:2px solid var(--ovu)}
+.c.fut::after{opacity:.55}
+.c.today{box-shadow:0 0 0 3px var(--ink)}
+.c.sel{outline:3px solid var(--lut);outline-offset:1px}
+.c .dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--ink);opacity:.7}
+.c.p-mens:not(.fut) .dot{background:#fff}
+#day{margin-top:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{min-height:40px;padding:6px 14px;font-weight:500}
+.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:12px;margin:20px 0 28px}
+.hist{list-style:none;padding:0;margin:0}
+.hist li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.hist .bar{flex:1 1 120px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.hist .bar i{display:block;height:100%;background:var(--mens)}
+.hist b{white-space:nowrap}.hist span{color:var(--mut);white-space:nowrap;font-size:15px}
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:16px}
+.chk input{width:22px;height:22px;accent-color:var(--mens);flex:none;margin-top:2px}
+.note{font-size:13px;color:var(--mut);margin-top:40px;max-width:70ch}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;transition:.25s;pointer-events:none;font-weight:500;max-width:90vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.seg{transition:opacity .4s}
+@media(prefers-reduced-motion:reduce){.seg,#toast{transition:none}}
+@media(max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.ring{width:min(100%,320px)}}
+@media(max-width:420px){nav{width:100%}nav a{padding:9px 11px;font-size:15px}.cal{gap:4px}.c{border-radius:10px;font-size:14px}.c::after{bottom:4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><img src="icons/icon.svg" alt="" width="34" height="34">Luna</div>
+  <nav class="scroll" id="nav">
+    <a href="#heute" data-v="heute">Heute</a>
+    <a href="#kalender" data-v="kalender">Kalender</a>
+    <a href="#verlauf" data-v="verlauf">Verlauf</a>
+    <a href="#einstellungen" data-v="einstellungen">Einstellungen</a>
+  </nav>
+</header>
+
+<section class="view" id="v-heute"></section>
+
+<section class="view" id="v-kalender">
+  <div class="calhead">
+    <button class="ghost" id="prev" aria-label="Vorheriger Monat">‹</button>
+    <h2 id="mon"></h2>
+    <button class="ghost" id="next" aria-label="Nächster Monat">›</button>
+  </div>
+  <div class="cal" id="cal"></div>
+  <div class="legend" id="leg2"></div>
+  <div id="day"></div>
+</section>
+
+<section class="view" id="v-verlauf">
+  <h2>Verlauf</h2>
+  <div class="stats" id="stats"></div>
+  <ul class="hist" id="hist"></ul>
+  <div class="card" style="margin-top:24px">
+    <h3>Frühere Periode nachtragen</h3>
+    <p class="hint">Je mehr Zyklen eingetragen sind, desto genauer wird die Prognose.</p>
+    <div class="row" style="margin-top:12px"><input type="date" id="addDate" style="max-width:220px"><button id="addBtn">Hinzufügen</button></div>
+  </div>
+</section>
+
+<section class="view" id="v-einstellungen">
+  <h2>Einstellungen</h2>
+  <div class="set" style="margin-top:20px">
+    <div class="card">
+      <h3>Zyklus</h3>
+      <label for="sCyc">Zykluslänge (Tage)</label>
+      <input type="number" id="sCyc" min="20" max="45">
+      <label for="sPer">Dauer der Periode (Tage)</label>
+      <input type="number" id="sPer" min="2" max="10">
+      <label class="chk"><input type="checkbox" id="sAuto"><span>Zykluslänge automatisch aus dem Verlauf berechnen (Ø der letzten 6 Zyklen)</span></label>
+      <p class="hint" id="autoHint"></p>
+    </div>
+    <div class="card">
+      <h3>Backup</h3>
+      <p class="hint">Alle Daten liegen nur hier im Browser. Für ein Backup den Text kopieren und z. B. in einem Passwortmanager oder einer Notiz sichern.</p>
+      <div class="row" style="margin-top:12px"><button id="expBtn">Backup erstellen</button><button id="cpyBtn" class="ghost">Kopieren</button></div>
+      <textarea id="exp" readonly placeholder="Hier erscheint das Backup" style="margin-top:10px"></textarea>
+      <label for="imp">Backup wiederherstellen</label>
+      <textarea id="imp" placeholder="Backup-Text hier einfügen"></textarea>
+      <div class="row" style="margin-top:10px"><button id="impBtn">Wiederherstellen</button></div>
+    </div>
+    <div class="card">
+      <h3>Alles löschen</h3>
+      <p class="hint">Entfernt alle Einträge und Notizen aus diesem Browser.</p>
+      <div class="row" style="margin-top:12px"><button class="danger" id="rstBtn">Alle Daten löschen</button></div>
+    </div>
+  </div>
+</section>
+
+<p class="note" id="foot"></p>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+{
+const DAY=864e5,KEY='zyklus-app-v1';
+const $=s=>document.querySelector(s);
+const toN=s=>{const[y,m,d]=s.split('-').map(Number);return Math.round(Date.UTC(y,m-1,d)/DAY)};
+const toS=n=>new Date(n*DAY).toISOString().slice(0,10);
+const T0=()=>{const t=new Date();return Math.round(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/DAY)};
+const fmt=(n,o={day:'numeric',month:'long'})=>new Date(n*DAY).toLocaleDateString('de-DE',{timeZone:'UTC',...o});
+const wd=n=>fmt(n,{weekday:'short',day:'numeric',month:'short'});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inDays=d=>d===0?'heute':d===1?'morgen':d===-1?'gestern':d>0?`in ${d} Tagen`:`vor ${-d} Tagen`;
+const fresh=()=>({starts:[],cycle:28,period:5,auto:true,notes:{}});
+let canSave=true;
+function load(){try{const r=localStorage.getItem(KEY);return r?{...fresh(),...JSON.parse(r)}:fresh()}catch(e){canSave=false;return fresh()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){canSave=false}foot()}
+let S=load();
+
+const PH={
+ mens:{n:'Periode',t:'Die Gebärmutterschleimhaut wird abgestoßen. Viele fühlen sich jetzt müder, Krämpfe und Rückenschmerzen sind häufig.',tips:['Wärmflasche oder Tee anbieten','Pläne lieber locker halten','Schmerzmittel und Periodenprodukte im Haus?']},
+ foll:{n:'Follikelphase',t:'Östrogen steigt, ein neues Ei reift heran. Energie und Laune ziehen oft spürbar an.',tips:['Gute Zeit für Unternehmungen und Neues','Sport und Aktivitäten fallen oft leichter']},
+ fert:{n:'Fruchtbare Tage',t:'Rund um den Eisprung ist eine Schwangerschaft am wahrscheinlichsten. Viele fühlen sich jetzt besonders wohl und gesellig.',tips:['Schöne Zeit für einen Date-Abend','Kinderwunsch: jetzt ist das Zeitfenster','Kein Kinderwunsch: die Rechnung hier ist keine Verhütung']},
+ ovu:{n:'Eisprung (geschätzt)',t:'Rechnerisch der fruchtbarste Tag. Manche spüren ein leichtes Ziehen im Unterbauch.',tips:['Oft viel Energie und gute Laune','Kein Kinderwunsch: die Rechnung hier ist keine Verhütung']},
+ lut:{n:'Lutealphase',t:'Progesteron übernimmt, der Körper stellt sich auf eine mögliche Schwangerschaft ein. Oft ruhiger, mit mehr Lust auf Gemütlichkeit.',tips:['Gemütliche Abende statt Großprogramm','Genug Schlaf – der Körper arbeitet mehr']},
+ pms:{n:'Kurz vor der Periode',t:'Die Hormone fallen ab. PMS ist jetzt möglich: Reizbarkeit, Heißhunger, Brustspannen, schlechter Schlaf.',tips:['Extra Geduld – nichts persönlich nehmen','Lieblingssnack besorgen','Vorrat an Periodenprodukten checken']},
+ late:{n:'Periode verspätet',t:'Die Periode kommt später als berechnet. Ein paar Tage Schwankung sind normal – Stress, Krankheit oder Reisen verschieben den Zyklus.',tips:['Sobald sie beginnt: „Periode hat begonnen“ tippen','Bei deutlich mehr als einer Woche ggf. Test oder Frauenärztin']}
+};
+const LEG=[['mens','Periode'],['foll','Follikelphase'],['fert','Fruchtbar'],['ovu','Eisprung'],['lut','Lutealphase'],['pms','Vor der Periode']];
+const SYM=['Krämpfe','Kopfweh','Müde','Gereizt','Heißhunger','Empfindlich','Gut drauf','Viel Energie'];
+
+const starts=()=>[...new Set(S.starts)].map(toN).sort((a,b)=>a-b);
+const gaps=()=>{const s=starts(),g=[];for(let i=1;i<s.length;i++){const d=s[i]-s[i-1];if(d>=15&&d<=60)g.push(d)}return g};
+function avg(){const g=gaps().slice(-6);return S.auto&&g.length?Math.round(g.reduce((a,b)=>a+b,0)/g.length):S.cycle}
+function phase(d,len,P){
+ if(d>len)return'late';if(d<=P)return'mens';
+ const o=len-14;if(d===o)return'ovu';
+ if(d>=o-5&&d<=o+1)return'fert';if(d<o-5)return'foll';
+ return d>len-5?'pms':'lut';
+}
+function info(n){
+ const st=starts();if(!st.length||n<st[0])return null;
+ const T=T0(),L=avg();let i=st.length-1;while(st[i]>n)i--;
+ let s=st[i],len,proj=false;
+ if(i<st.length-1)len=st[i+1]-s;
+ else{len=L;const a=T>=s+L?T+1:s+L;if(n>=a){s=a+Math.floor((n-a)/L)*L;proj=true}}
+ const day=n-s+1;return{s,len,day,proj,ph:phase(day,len,S.period)};
+}
+function nextStart(){const st=starts(),s=st[st.length-1],L=avg(),T=T0();return T>=s+L?{n:T+1,late:T-(s+L)+1}:{n:s+L,late:0}}
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+function foot(){$('#foot').textContent=(canSave?'Alle Daten werden nur lokal in diesem Browser gespeichert – nichts verlässt das Gerät. ':'Speichern ist in dieser Ansicht nicht möglich – Einträge gehen beim Schließen verloren. ')+'Die Phasen sind eine Rechnung auf Basis von Durchschnittswerten, keine medizinische Auskunft und keine Verhütungsmethode.'}
+function addStart(n){const s=toS(n);if(S.starts.includes(s))return false;S.starts.push(s);S.starts.sort();save();return true}
+function delStart(s){S.starts=S.starts.filter(x=>x!==s);save()}
+const legend=()=>LEG.map(([k,n])=>`<span><i style="background:var(--${k})"></i>${n}</span>`).join('');
+
+/* ---------- Heute ---------- */
+function ringSVG(day,len,late){
+ const tot=Math.max(len,day),cx=160,r=128,P=S.period,g=.9;
+ const pt=a=>[cx+r*Math.cos(a*Math.PI/180),cx+r*Math.sin(a*Math.PI/180)];
+ let h='';
+ for(let i=1;i<=tot;i++){
+  const a0=-90+(i-1)*360/tot+g,a1=-90+i*360/tot-g,[x0,y0]=pt(a0),[x1,y1]=pt(a1),ph=phase(i,len,P);
+  h+=`<path class="seg" d="M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}" stroke="var(--${ph})" stroke-width="24" fill="none" opacity="${i<=day?1:.32}"/>`;
+ }
+ const [mx,my]=pt(-90+(day-.5)*360/tot);
+ h+=`<circle cx="${mx}" cy="${my}" r="19" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/><circle cx="${mx}" cy="${my}" r="8" fill="var(--${phase(day,len,P)})"/>`;
+ return `<svg viewBox="0 0 320 320" role="img" aria-label="Zyklus-Rad, Tag ${day} von ${len}">${h}</svg>`;
+}
+function renderToday(){
+ const v=$('#v-heute'),T=T0();
+ if(!S.starts.length){
+  v.innerHTML=`<div class="setup"><h2>Wo steht der Zyklus gerade?</h2>
+  <p class="lead">Einmal den ersten Tag der letzten Periode eintragen – ab dann zeigt die App jeden Tag, in welcher Phase sie ist und was als Nächstes kommt.</p>
+  <label for="iDate">Erster Tag der letzten Periode</label><input type="date" id="iDate" max="${toS(T)}" value="${toS(T-7)}">
+  <label for="iCyc">Zykluslänge</label><input type="number" id="iCyc" min="20" max="45" value="28"><p class="hint">Von einem Periodenbeginn zum nächsten. Unsicher? 28 passt für viele.</p>
+  <label for="iPer">Dauer der Periode</label><input type="number" id="iPer" min="2" max="10" value="5">
+  <div class="row" style="margin-top:22px"><button class="pri" id="iGo">Los geht’s</button></div></div>`;
+  $('#iGo').onclick=()=>{const d=$('#iDate').value;if(!d||toN(d)>T){toast('Bitte ein Datum bis heute wählen');return}
+   S.cycle=clamp(+$('#iCyc').value||28,20,45);S.period=clamp(+$('#iPer').value||5,2,10);addStart(toN(d));toast('Gespeichert');render()};
+  return;
+ }
+ const inf=info(T),L=avg(),P=S.period,p=PH[inf.ph],ns=nextStart(),o=L-14;
+ const late=inf.ph==='late';
+ const mid=late?`<small>Periode</small><b>+${inf.day-inf.len}</b><small>${inf.day-inf.len===1?'Tag':'Tage'} drüber</small>`:`<small>Zyklustag</small><b>${inf.day}</b><small>von ${inf.len}</small>`;
+ // fruchtbares Fenster: aktuelles oder nächstes
+ let fs=inf.s+o-6,fe=inf.s+o;if(T>fe||late){fs=ns.n+o-6;fe=ns.n+o}
+ const ov=fe-1,pmsS=ns.n-5;
+ const isStartToday=starts().includes(T);
+ const pmsTxt=T>=pmsS&&T<ns.n?'läuft gerade':inDays(pmsS-T);
+ const cards=[
+  ['Nächste Periode',late?`überfällig`:inDays(ns.n-T),late?`seit ${ns.late} ${ns.late===1?'Tag':'Tagen'}`:wd(ns.n)],
+  ['Fruchtbares Fenster',T>=fs&&T<=fe?'jetzt':inDays(fs-T),`${fmt(fs,{day:'numeric',month:'short'})} – ${fmt(fe,{day:'numeric',month:'short'})}`],
+  ['Eisprung (geschätzt)',ov===T?'heute':inDays(ov-T),wd(ov)],
+  ['PMS möglich ab',pmsTxt,wd(pmsS)]
+ ];
+ const ups=[0,1,2].map(k=>ns.n+k*L).map(n=>`<li><b>${fmt(n,{weekday:'long',day:'numeric',month:'long'})}</b><span>bis ${fmt(n+P-1,{day:'numeric',month:'short'})} · ${inDays(n-T)}</span></li>`).join('');
+ v.innerHTML=`<div class="hero" style="--pc:var(--${inf.ph})">
+  <div><div class="ring">${ringSVG(inf.day,inf.len,late)}<div class="mid">${mid}</div></div><div class="legend">${legend()}</div></div>
+  <div><span class="tag">${fmt(T,{weekday:'long',day:'numeric',month:'long'})}</span>
+   <h2 style="margin-top:10px">${p.n}</h2><p class="lead">${p.t}</p>
+   <ul class="tips">${p.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+   <div class="row"><button class="pri" id="startNow" ${isStartToday?'disabled':''}>${isStartToday?'Heute eingetragen':'Periode hat heute begonnen'}</button>
+   <a class="btn" href="#kalender" style="text-decoration:none;display:inline-flex;align-items:center">Anderer Tag?</a></div></div></div>
+ <div class="grid">${cards.map(c=>`<div class="card"><small>${c[0]}</small><strong>${c[1]}</strong><span>${c[2]}</span></div>`).join('')}</div>
+ <div class="up"><h3>Die nächsten Perioden</h3><ol>${ups}</ol>
+ <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${S.auto&&gaps().length?' (Ø aus dem Verlauf)':''} und ${P} Tagen Periode.</p></div>`;
+ const b=$('#startNow');if(b)b.onclick=()=>{if(addStart(T)){toast('Neuer Zyklus gestartet');render()}};
+}
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,Math.round(x)));
+
+/* ---------- Kalender ---------- */
+let cy,cm,sel=null;
+{const d=new Date();cy=d.getFullYear();cm=d.getMonth()}
+function renderCal(){
+ const T=T0(),first=Math.round(Date.UTC(cy,cm,1)/DAY),dim=new Date(Date.UTC(cy,cm+1,0)).getUTCDate(),off=(new Date(first*DAY).getUTCDay()+6)%7,st=starts();
+ $('#mon').textContent=new Date(Date.UTC(cy,cm,1)).toLocaleDateString('de-DE',{month:'long',year:'numeric',timeZone:'UTC'});
+ let h=['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="wd">${d}</div>`).join('')+'<div class="c e"></div>'.repeat(off);
+ for(let i=0;i<dim;i++){
+  const n=first+i,inf=info(n),k=toS(n),nt=S.notes[k];
+  const cls=['c',inf?'p-'+inf.ph:'',inf&&(inf.proj||n>T)?'fut':'',n===T?'today':'',sel===n?'sel':''].join(' ');
+  const pc=inf&&inf.ph!=='mens'?`style="--pc:var(--${inf.ph})"`:'';
+  const lab=`${fmt(n,{weekday:'long',day:'numeric',month:'long'})}${inf?', '+PH[inf.ph].n:''}${st.includes(n)?', Periodenbeginn':''}`;
+  h+=`<button class="${cls}" ${pc} data-n="${n}" aria-label="${lab}">${i+1}${nt&&(nt.sym.length||nt.text)?'<span class="dot"></span>':''}</button>`;
+ }
+ $('#cal').innerHTML=h;$('#leg2').innerHTML=legend()+'<span><i style="border:1.5px dashed var(--mens)"></i>Prognose</span>';
+ renderDay();
+}
+function renderDay(){
+ const box=$('#day');if(sel===null){box.innerHTML='<p class="hint" style="text-align:center;margin-top:18px">Tag antippen, um Periodenbeginn oder Notizen einzutragen.</p>';return}
+ const n=sel,inf=info(n),k=toS(n),nt=S.notes[k]||{sym:[],text:''},isS=S.starts.includes(k),T=T0();
+ box.innerHTML=`<div class="card" style="--pc:var(--${inf?inf.ph:'late'})">
+  <small>${fmt(n,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</small>
+  <strong>${inf?`${inf.ph==='late'?'Verspätet':'Zyklustag '+inf.day} · ${PH[inf.ph].n}`:'Vor dem ersten Eintrag'}</strong>
+  ${inf&&(inf.proj||n>T)?'<span>Prognose</span>':''}
+  <div class="row" style="margin-top:14px">${n>T?'':isS?'<button class="danger" id="dS">Periodenbeginn entfernen</button>':'<button class="pri" id="aS">Periode begann an diesem Tag</button>'}</div>
+  <label>Wie geht’s ihr?</label><div class="chips">${SYM.map(s=>`<button data-s="${s}" class="${nt.sym.includes(s)?'on':''}" aria-pressed="${nt.sym.includes(s)}">${s}</button>`).join('')}</div>
+  <label for="nTxt">Notiz</label><textarea id="nTxt" placeholder="z. B. Termin bei der Frauenärztin, war heute sehr müde …">${esc(nt.text)}</textarea></div>`;
+ const setN=f=>{const c=S.notes[k]||{sym:[],text:''};f(c);if(!c.sym.length&&!c.text.trim())delete S.notes[k];else S.notes[k]=c;save()};
+ box.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const s=b.dataset.s;setN(c=>{c.sym=c.sym.includes(s)?c.sym.filter(x=>x!==s):[...c.sym,s]});renderCal()});
+ $('#nTxt').onchange=e=>{setN(c=>c.text=e.target.value);renderCal();toast('Notiz gespeichert')};
+ const a=$('#aS'),d=$('#dS');
+ if(a)a.onclick=()=>{addStart(n);toast('Periodenbeginn eingetragen');render()};
+ if(d)d.onclick=()=>{delStart(k);toast('Eintrag entfernt');render()};
+}
+$('#cal').onclick=e=>{const b=e.target.closest('[data-n]');if(!b)return;sel=+b.dataset.n===sel?null:+b.dataset.n;renderCal()};
+$('#prev').onclick=()=>{cm--;if(cm<0){cm=11;cy--}renderCal()};
+$('#next').onclick=()=>{cm++;if(cm>11){cm=0;cy++}renderCal()};
+
+/* ---------- Verlauf ---------- */
+function renderHist(){
+ const st=starts(),g=gaps(),T=T0();
+ const sv=(l,v,s)=>`<div class="card"><small>${l}</small><strong>${v}</strong><span>${s}</span></div>`;
+ $('#stats').innerHTML=g.length?sv('Ø Zykluslänge',avg()+' Tage',S.auto?'letzte 6 Zyklen':'aus Einstellungen')+sv('Kürzester',Math.min(...g)+' Tage','')+sv('Längster',Math.max(...g)+' Tage','')+sv('Erfasste Zyklen',g.length,'abgeschlossen')
+  :sv('Noch kein ganzer Zyklus',st.length?'1 Eintrag':'–','Ab dem zweiten Periodenbeginn wird der Schnitt berechnet');
+ const mx=Math.max(35,...g);
+ $('#hist').innerHTML=st.length?st.map((n,i)=>{const len=i<st.length-1?st[i+1]-n:null;
+  return `<li><b>${fmt(n,{day:'numeric',month:'short',year:'numeric'})}</b><div class="bar"><i style="width:${((len||T-n+1)/mx*100).toFixed(1)}%;opacity:${len?1:.4}"></i></div><span>${len?len+' Tage':'läuft · Tag '+(T-n+1)}</span><button class="ghost danger" data-d="${toS(n)}" aria-label="Eintrag ${fmt(n)} löschen">Löschen</button></li>`}).reverse().join('')
+  :'<li><span>Noch keine Einträge.</span></li>';
+ $('#addDate').max=toS(T);
+}
+$('#hist').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;
+ if(b.dataset.ok){delStart(b.dataset.d);toast('Eintrag gelöscht');render()}else{b.dataset.ok=1;b.textContent='Wirklich?';setTimeout(()=>{if(b.isConnected){delete b.dataset.ok;b.textContent='Löschen'}},3000)}};
+$('#addBtn').onclick=()=>{const d=$('#addDate').value;if(!d)return toast('Bitte ein Datum wählen');if(toN(d)>T0())return toast('Datum liegt in der Zukunft');
+ toast(addStart(toN(d))?'Nachgetragen':'Ist schon eingetragen');$('#addDate').value='';render()};
+
+/* ---------- Einstellungen ---------- */
+function renderSet(){
+ $('#sCyc').value=S.cycle;$('#sPer').value=S.period;$('#sAuto').checked=S.auto;
+ const g=gaps();$('#autoHint').textContent=S.auto?(g.length?`Aktuell gerechnet: ${avg()} Tage (aus ${Math.min(6,g.length)} Zyklen).`:'Noch kein ganzer Zyklus erfasst – bis dahin gilt der Wert oben.'):'Es gilt immer der Wert oben.';
+}
+$('#sCyc').onchange=e=>{S.cycle=clamp(+e.target.value||28,20,45);save();render();toast('Gespeichert')};
+$('#sPer').onchange=e=>{S.period=clamp(+e.target.value||5,2,10);save();render();toast('Gespeichert')};
+$('#sAuto').onchange=e=>{S.auto=e.target.checked;save();render()};
+$('#expBtn').onclick=()=>{$('#exp').value=JSON.stringify({app:'luna',v:1,data:S})};
+$('#cpyBtn').onclick=()=>{const t=$('#exp');if(!t.value)t.value=JSON.stringify({app:'luna',v:1,data:S});
+ navigator.clipboard.writeText(t.value).then(()=>toast('Kopiert')).catch(()=>{t.select();toast('Text markiert – jetzt kopieren')})};
+$('#impBtn').onclick=()=>{try{const o=JSON.parse($('#imp').value),d=o.data||o;
+ if(!Array.isArray(d.starts)||!d.starts.every(s=>/^\d{4}-\d{2}-\d{2}$/.test(s)))throw 0;
+ S={...fresh(),...d};save();$('#imp').value='';render();toast('Backup wiederhergestellt')}catch(e){toast('Das sieht nicht nach einem gültigen Backup aus')}};
+$('#rstBtn').onclick=e=>{const b=e.target;if(b.dataset.ok){S=fresh();save();sel=null;render();location.hash='#heute';toast('Alles gelöscht');delete b.dataset.ok;b.textContent='Alle Daten löschen'}
+ else{b.dataset.ok=1;b.textContent='Wirklich alles löschen?';setTimeout(()=>{delete b.dataset.ok;b.textContent='Alle Daten löschen'},3500)}};
+
+/* ---------- Routing ---------- */
+const VIEWS=['heute','kalender','verlauf','einstellungen'];
+function route(){const h=location.hash.slice(1),v=VIEWS.includes(h)?h:'heute';
+ VIEWS.forEach(x=>{$('#v-'+x).classList.toggle('on',x===v);document.querySelector(`nav a[data-v=${x}]`).classList.toggle('on',x===v)})}
+function render(){renderToday();renderCal();renderHist();renderSet();foot()}
+addEventListener('hashchange',route);
+render();route();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+// um Mitternacht weiterspringen
+let lastT=T0();setInterval(()=>{if(T0()!==lastT){lastT=T0();render()}},60000);
+}
+</script>
+</body>
+</html>
