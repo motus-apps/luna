@@ -79,6 +79,8 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .evl li{display:flex;align-items:center;gap:12px;padding:8px 6px 8px 12px;border:1px solid var(--line);border-radius:14px}
 .evl .em{font-size:22px;flex:none}.evl div{flex:1;min-width:0}.evl b{display:block;font-size:15px}.evl b small{display:inline;color:var(--mut);font-weight:400;font-size:13px}
 .evl input[type=text]{border:0;padding:2px 0;background:none;font-size:15px;border-radius:0;width:100%}.evl input:focus{outline:none;box-shadow:0 1px 0 var(--pc)}
+.evl label.yr{display:inline-flex;align-items:center;gap:6px;margin:4px 0 0;font-weight:500;font-size:13px;color:var(--mut);cursor:pointer;min-height:32px}
+.evl label.yr input{width:16px;height:16px;margin:0;accent-color:var(--pc)}
 .evl button{min-height:44px;width:44px;padding:0;flex:none;border:0}
 .next li i.ev{width:auto;height:auto;background:none;font-style:normal;font-size:15px}
 .mu{margin-top:24px}.mu ul{list-style:none;padding:0;margin:14px 0;display:grid;gap:14px}
@@ -405,12 +407,14 @@ const YOU={
 };
 const LEG=[['mens','Periode'],['foll','Follikelphase'],['fert','Fruchtbar'],['ovu','Eisprung'],['lut','Lutealphase'],['pms','Vor der Periode']];
 // Optionale Ereignisse im Kalender: [Emoji, Name, Platzhalter für die Notiz, jährlich wiederkehrend]
-const EVT={geb:['🎂','Geburtstag','Wessen Geburtstag?',1],jt:['💍','Jahrestag','Was feiert ihr?',1],sex:['❤️','Sex','',0],streit:['⚡','Streit','Worum ging’s?',0],
+const EVT={geb:['🎂','Geburtstag','Wessen Geburtstag?',1],jt:['💍','Jahrestag','z. B. Zusammenkommen, erstes Date',1],hz:['💒','Hochzeitstag','z. B. Standesamt oder Kirche',1],sex:['❤️','Sex','',0],streit:['⚡','Streit','Worum ging’s?',0],
  schoen:['✨','Schöner Moment','Was war schön?',0],idee:['💡','Erkenntnis','Was hast du verstanden?',0],sonst:['📌','Sonstiges','Was steht an?',0]};
+// jährlich wiederkehrend: pro Eintrag einstellbar (e.y), sonst Vorgabe des Typs
+const yearly=e=>e.y!==undefined?!!e.y:!!EVT[e.t][3];
 // Ereignisse an Tag n (jährliche ab dem eingetragenen Datum jedes Jahr am selben Tag)
-function evOn(p,n){const k=toS(n);return (p.events||[]).filter(e=>EVT[e.t]&&(e.d===k||(EVT[e.t][3]&&e.d.slice(4)===k.slice(4)&&e.d<k)))}
+function evOn(p,n){const k=toS(n);return (p.events||[]).filter(e=>EVT[e.t]&&(e.d===k||(yearly(e)&&e.d.slice(4)===k.slice(4)&&e.d<k)))}
 function evYears(e,n){const y=+toS(n).slice(0,4)-+e.d.slice(0,4);if(y<=0)return'';return e.t==='geb'?`wird ${y}`:`${y} ${y===1?'Jahr':'Jahre'}`}
-const evLabel=(e,n)=>{const v=EVT[e.t],y=EVT[e.t][3]?evYears(e,n):'';return `${v[1]}${e.x?' · '+esc(e.x):''}${y?' · '+y:''}`};
+const evLabel=(e,n)=>{const v=EVT[e.t],y=yearly(e)?evYears(e,n):'';return `${v[1]}${e.x?' · '+esc(e.x):''}${y?' · '+y:''}`};
 const SYM=['Krämpfe','Kopfweh','Müde','Gereizt','Heißhunger','Empfindlich','Gut drauf','Viel Energie'];
 const legend=()=>LEG.map(([k,n])=>`<span><i style="background:var(--${k})"></i>${n}</span>`).join('');
 const pname=p=>p.name||'Ohne Name';
@@ -573,8 +577,9 @@ function renderDay(){
   <small>${fmt(n,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</small>
   <strong>${inf?`Zyklustag ${inf.day} · ${PH[inf.ph].n}`:'Vor dem ersten Eintrag'}</strong>
   ${inf&&(inf.proj||n>T)?'<span>Prognose</span>':''}
-  ${evs.length?`<ul class="evl">${evs.map(e=>{const v=EVT[e.t],y=v[3]?evYears(e,n):'';return `<li><span class="em" aria-hidden="true">${v[0]}</span><div><b>${v[1]}${y?' · '+y:''}${v[3]&&e.d!==k?` <small>seit ${fmt(toN(e.d),{year:'numeric'})}</small>`:''}</b>
-   <input type="text" data-ev="${e.id}" value="${esc(e.x||'')}" placeholder="${v[2]||'Notiz (optional)'}" maxlength="120" aria-label="Notiz zu ${v[1]}"></div>
+  ${evs.length?`<ul class="evl">${evs.map(e=>{const v=EVT[e.t],yr=yearly(e),y=yr?evYears(e,n):'';return `<li><span class="em" aria-hidden="true">${v[0]}</span><div><b>${v[1]}${y?' · '+y:''}${yr&&e.d!==k?` <small>seit ${fmt(toN(e.d),{year:'numeric'})}</small>`:''}</b>
+   <input type="text" data-ev="${e.id}" value="${esc(e.x||'')}" placeholder="${v[2]||'Notiz (optional)'}" maxlength="120" aria-label="Notiz zu ${v[1]}">
+   <label class="yr"><input type="checkbox" data-yr="${e.id}" ${yr?'checked':''}> jedes Jahr</label></div>
    <button class="ghost" data-del="${e.id}" aria-label="${v[1]} entfernen">✕</button></li>`}).join('')}</ul>`:''}
   <p class="lbl" style="margin-top:18px">Ereignis festhalten <span class="opt">optional</span></p>
   <div class="chips">${Object.entries(EVT).map(([t,v])=>`<button data-add="${t}">${v[0]} ${v[1]}</button>`).join('')}</div>
@@ -587,6 +592,7 @@ function renderDay(){
  box.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const t=b.dataset.add,id=uid();p.events.push({id,t,d:k,x:''});save();render();
   const inp=$(`[data-ev="${id}"]`);if(inp&&EVT[t][2])inp.focus();toast(EVT[t][0]+' '+EVT[t][1]+' gespeichert')});
  box.querySelectorAll('[data-ev]').forEach(i=>i.onchange=()=>{const e=p.events.find(x=>x.id===i.dataset.ev);if(e){e.x=i.value.trim();save();render()}});
+ box.querySelectorAll('[data-yr]').forEach(i=>i.onchange=()=>{const e=p.events.find(x=>x.id===i.dataset.yr);if(e){e.y=i.checked;save();render();toast(i.checked?'Wiederholt sich jedes Jahr':'Nur an diesem Tag')}});
  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{p.events=p.events.filter(x=>x.id!==b.dataset.del);save();render();toast('Entfernt')});
  $('#nTxt').onchange=e=>{setN(c=>c.text=e.target.value);renderCal();toast('Notiz gespeichert')};
  const a=$('#aS'),d=$('#dS');
@@ -614,7 +620,7 @@ function renderHist(){
 // Muster: in welchen Phasen lagen Ereignisse? Nur sichtbar, wenn es Einträge gibt – nichts wird abgefragt.
 const GRP=[['mens','Periode',['mens']],['foll','Follikelphase',['foll']],['fert','Fruchtbare Tage',['fert','ovu']],['lut','Lutealphase',['lut']],['pms','Vor der Periode',['pms']]];
 function renderMuster(p,T){
- const past=(p.events||[]).filter(e=>EVT[e.t]&&!EVT[e.t][3]&&toN(e.d)<=T);
+ const past=(p.events||[]).filter(e=>EVT[e.t]&&!yearly(e)&&toN(e.d)<=T);
  const rows=['streit','schoen','sex','idee'].map(t=>{const es=past.filter(e=>e.t===t).map(e=>info(p,toN(e.d),T)).filter(Boolean);if(!es.length)return'';
   const cnt=GRP.map(g=>es.filter(x=>g[2].includes(x.ph)).length),top=cnt.indexOf(Math.max(...cnt));
   const bar=GRP.map((g,i)=>cnt[i]?`<i style="flex:${cnt[i]};background:var(--${g[0]})" title="${g[1]}: ${cnt[i]}"></i>`:'').join('');
