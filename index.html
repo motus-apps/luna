@@ -36,6 +36,7 @@ nav a{flex:none;padding:9px 16px;border-radius:999px;color:var(--mut);text-decor
 nav a.on{background:var(--ink);color:var(--bg)}
 a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--fert);outline-offset:2px}
 .people{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px}
+.people[hidden]{display:none}
 .people button{flex:none;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 16px 6px 8px;font-weight:500}
 .people button .em{font-size:22px;line-height:1}
 .people button .pd{width:9px;height:9px;border-radius:50%}
@@ -253,13 +254,13 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
   <div class="sec"><h2 style="font-size:clamp(26px,4vw,34px)">Die vier Phasen</h2>
   <p class="hint">Tage gelten für 28 Tage. Ist der Zyklus länger, dauert vor allem die Follikelphase länger – die Lutealphase bleibt meist rund 14 Tage.</p>
   <div class="seasons"><article class="season" id="wi-winter" style="--pc:var(--mens)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M70 28a34 34 0 1 0 22 52A28 28 0 1 1 70 28z" fill="var(--pc)"/><circle cx="84" cy="34" r="3.5" fill="var(--pc)" opacity=".6"/><circle cx="94" cy="50" r="2.5" fill="var(--pc)" opacity=".5"/><circle cx="30" cy="30" r="2.5" fill="var(--pc)" opacity=".5"/></svg><h3>Periode</h3><div class="sub">Tag 1–5 · Ruhe</div>
-<dl><div><dt>Im Körper</dt><dd>Östrogen und Progesteron sind am Tiefpunkt, die Gebärmutterschleimhaut wird abgestoßen.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Weniger Energie, eher nach innen gekehrt. Krämpfe, Rücken- oder Kopfschmerzen sind häufig.</dd></div><div><dt>Was du tun kannst</dt><dd>Wärmflasche, Tee, Lieblingsessen. Aufgaben abnehmen und Pläne locker halten.</dd></div></dl>
+<dl><div><dt>Im Körper</dt><dd>Östrogen und Progesteron sind am Tiefpunkt, die Gebärmutterschleimhaut wird abgestoßen.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Weniger Energie, eher nach innen gekehrt. Krämpfe, Rücken- oder Kopfschmerzen sind häufig.</dd></div><div><dt>Was du tun kannst</dt><dd>Alltag abnehmen: Einkauf, Kochen, Termine. Abende ruhig halten, Programm locker planen.</dd></div></dl>
 <div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class=""></b><b class=""></b><b class=""></b><b class=""></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Gesellig</span><i><b class="f"></b><b class=""></b><b class=""></b><b class=""></b><b class=""></b></i></div></article><article class="season" id="wi-fruehling" style="--pc:var(--foll)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M28 90q32-12 64 0" stroke="var(--pc)" stroke-width="5" fill="none" stroke-linecap="round" opacity=".5"/><path d="M60 88V52" stroke="var(--pc)" stroke-width="5" stroke-linecap="round"/><path d="M60 60C60 42 46 34 30 36c0 16 12 26 30 24z" fill="var(--pc)"/><path d="M60 54c0-16 12-26 30-24 0 16-12 26-30 24z" fill="var(--pc)" opacity=".75"/></svg><h3>Follikelphase</h3><div class="sub">Tag 6–11 · Aufbau</div>
 <dl><div><dt>Im Körper</dt><dd>Östrogen steigt, in den Eierstöcken reift ein neues Ei heran.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Die Energie kommt zurück: neugierig, optimistisch, offen für Neues.</dd></div><div><dt>Was du tun kannst</dt><dd>Gute Zeit für Pläne, Ausflüge, Sport und neue Ideen – gemeinsam.</dd></div></dl>
 <div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b></i><span>Gesellig</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b></i></div></article><article class="season" id="wi-sommer" style="--pc:var(--fert)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(0 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(45 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(90 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(135 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(180 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(225 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(270 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(315 60 60)"/><circle cx="60" cy="60" r="20" fill="var(--pc)"/><circle cx="54" cy="54" r="6" fill="#fff" opacity=".35"/></svg><h3>Eisprung</h3><div class="sub">Tag 12–16 · Höhepunkt</div>
-<dl><div><dt>Im Körper</dt><dd>Östrogen auf dem Höhepunkt, eine LH-Welle löst den Eisprung aus. Das Ei lebt etwa 24 Stunden.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Oft Höhepunkt bei Energie, Selbstbewusstsein und Lust – gesellig und gesprächig.</dd></div><div><dt>Was du tun kannst</dt><dd>Date-Abend, Komplimente, zusammen etwas erleben. Kein Kinderwunsch: jetzt besonders sicher verhüten.</dd></div></dl>
+<dl><div><dt>Im Körper</dt><dd>Östrogen auf dem Höhepunkt, eine LH-Welle löst den Eisprung aus. Das Ei lebt etwa 24 Stunden.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Oft Höhepunkt bei Energie, Selbstbewusstsein und Lust – gesellig und gesprächig.</dd></div><div><dt>Was du tun kannst</dt><dd>Gute Tage, um zusammen etwas zu unternehmen oder Wichtiges zu besprechen. Kein Kinderwunsch: jetzt besonders sicher verhüten.</dd></div></dl>
 <div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i><span>Gesellig</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i></div></article><article class="season" id="wi-herbst" style="--pc:var(--lut)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M26 50q8.5-10 17 0t17 0 17 0 17 0" stroke="var(--pc)" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M26 68q8.5-7 17 0t17 0 17 0 17 0" stroke="var(--pc)" stroke-width="7" fill="none" stroke-linecap="round" opacity=".7"/><path d="M26 85q8.5-4 17 0t17 0 17 0 17 0" stroke="var(--pc)" stroke-width="7" fill="none" stroke-linecap="round" opacity=".4"/></svg><h3>Lutealphase</h3><div class="sub">Tag 17–28 · Ausklang</div>
-<dl><div><dt>Im Körper</dt><dd>Progesteron übernimmt: wirkt beruhigend, Körpertemperatur und Hunger steigen leicht. Zum Ende fallen beide Hormone ab.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Erst ruhig und gemütlich. In den letzten Tagen oft PMS: gereizt, traurig, Heißhunger, Brustspannen, schlechter Schlaf.</dd></div><div><dt>Was du tun kannst</dt><dd>Geduld, Gemütlichkeit, Snacks bereithalten. Und nie: „Hast du deine Tage?“</dd></div></dl>
+<dl><div><dt>Im Körper</dt><dd>Progesteron übernimmt: wirkt beruhigend, Körpertemperatur und Hunger steigen leicht. Zum Ende fallen beide Hormone ab.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Erst ruhig und gemütlich. In den letzten Tagen oft PMS: gereizt, traurig, Heißhunger, Brustspannen, schlechter Schlaf.</dd></div><div><dt>Was du tun kannst</dt><dd>Ruhige Abende, Termine entzerren, nicht jede spitze Bemerkung persönlich nehmen. Und nie: „Hast du deine Tage?“</dd></div></dl>
 <div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Gesellig</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i></div></article></div></div>
   <div class="sec"><h2 style="font-size:clamp(26px,4vw,34px)">Mythen und Fakten</h2>
   <div class="facts"><div class="fact"><s>Ein Zyklus hat 28 Tage.</s><p>Normal sind etwa 21 bis 35 Tage – und er schwankt auch bei derselben Frau.</p></div><div class="fact"><s>Der Eisprung ist an Tag 14.</s><p>Er liegt etwa 14 Tage <em>vor</em> der nächsten Periode. Bei 32 Tagen also eher um Tag 18.</p></div><div class="fact"><s>Fruchtbar ist man nur am Eisprung.</s><p>Spermien überleben bis zu 5 Tage – fruchtbar sind rund 6 Tage pro Zyklus.</p></div><div class="fact"><s>Schlechte Laune sind halt die Hormone.</s><p>Hormone beeinflussen, erklären aber nicht alles. Gefühle ernst nehmen statt wegerklären.</p></div><div class="fact"><s>Starke Regelschmerzen sind normal.</s><p>Leichte Krämpfe sind häufig. Schmerzen, die den Alltag lahmlegen, gehören zur Frauenärztin – z. B. wegen Endometriose.</p></div></div></div>
@@ -298,7 +299,7 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
       <label for="sPer">Dauer der Periode (Tage)</label>
       <input type="number" id="sPer" min="2" max="10">
       <label class="chk"><input type="checkbox" id="sAuto"><span>Zykluslänge automatisch aus dem Verlauf berechnen<small id="autoHint"></small></span></label>
-      <div class="row" style="margin-top:18px"><button class="danger" id="pDel">Person entfernen</button></div>
+      <div class="row" style="margin-top:18px"><button id="pNew">+ Weitere Person</button><button class="danger ghost" id="pDel">Person entfernen</button></div>
     </div>
 
     <div class="card">
@@ -372,23 +373,23 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){canSave
 function swCheck(){if('serviceWorker' in navigator)navigator.serviceWorker.ready.then(r=>r.active&&r.active.postMessage('check')).catch(()=>{})}
 
 const PH={
- mens:{n:'Periode',t:'Die Gebärmutterschleimhaut wird abgestoßen. Viele fühlen sich jetzt müder, Krämpfe und Rückenschmerzen sind häufig.',tips:['Wärmflasche oder Tee anbieten','Pläne lieber locker halten','Schmerzmittel und Periodenprodukte im Haus?']},
- foll:{n:'Follikelphase',t:'Östrogen steigt, ein neues Ei reift heran. Energie und Laune ziehen oft spürbar an.',tips:['Gute Zeit für Unternehmungen und Neues','Sport und Aktivitäten fallen oft leichter']},
- fert:{n:'Fruchtbare Tage',t:'Rund um den Eisprung ist eine Schwangerschaft am wahrscheinlichsten. Viele fühlen sich jetzt besonders wohl und gesellig.',tips:['Schöne Zeit für einen Date-Abend','Kinderwunsch: jetzt ist das Zeitfenster','Kein Kinderwunsch: nur mit sicherer Verhütung – die Rechnung ist keine Verhütung']},
- ovu:{n:'Eisprung (geschätzt)',t:'Rechnerisch der fruchtbarste Tag. Manche spüren ein leichtes Ziehen im Unterbauch.',tips:['Oft viel Energie und gute Laune','Kein Kinderwunsch: nur mit sicherer Verhütung']},
- lut:{n:'Lutealphase',t:'Progesteron übernimmt, der Körper stellt sich auf eine mögliche Schwangerschaft ein. Oft ruhiger, mit mehr Lust auf Gemütlichkeit.',tips:['Gemütliche Abende statt Großprogramm','Genug Schlaf – der Körper arbeitet mehr']},
- pms:{n:'Kurz vor der Periode',t:'Die Hormone fallen ab. PMS ist jetzt möglich: Reizbarkeit, Heißhunger, Brustspannen, schlechter Schlaf.',tips:['Extra Geduld – nichts persönlich nehmen','Lieblingssnack besorgen','Vorrat an Periodenprodukten checken']},
- late:{n:'Periode verspätet',t:'Die Periode kommt später als berechnet. Ein paar Tage Schwankung sind normal – Stress, Krankheit oder Reisen verschieben den Zyklus.',tips:['Sobald sie beginnt: auf „Heute“ kurz eintragen','Bei deutlich mehr als einer Woche ggf. Test oder Frauenärztin']}
+ mens:{n:'Periode',t:'Die Gebärmutterschleimhaut wird abgestoßen. Viele fühlen sich jetzt müder, Krämpfe und Rückenschmerzen sind häufig.'},
+ foll:{n:'Follikelphase',t:'Östrogen steigt, ein neues Ei reift heran. Energie und Laune ziehen oft spürbar an.'},
+ fert:{n:'Fruchtbare Tage',t:'Rund um den Eisprung ist eine Schwangerschaft am wahrscheinlichsten. Viele fühlen sich jetzt besonders wohl und gesellig.'},
+ ovu:{n:'Eisprung (geschätzt)',t:'Rechnerisch der fruchtbarste Tag. Manche spüren ein leichtes Ziehen im Unterbauch.'},
+ lut:{n:'Lutealphase',t:'Progesteron übernimmt, der Körper stellt sich auf eine mögliche Schwangerschaft ein. Oft ruhiger, mit mehr Lust auf Gemütlichkeit.'},
+ pms:{n:'Kurz vor der Periode',t:'Die Hormone fallen ab. PMS ist jetzt möglich: Reizbarkeit, Heißhunger, Brustspannen, schlechter Schlaf.'},
+ late:{n:'Periode verspätet',t:'Die Periode kommt später als berechnet. Ein paar Tage Schwankung sind normal – Stress, Krankheit oder Reisen verschieben den Zyklus.'}
 };
 // Lagebericht: typische Tendenz (Energie, Laune, Lust, Gesellig, je 1–5) und was das für den Partner heißt
 const YOU={
- mens:{m:[1,2,2,1],s:'Sie braucht jetzt vor allem Ruhe und Rücksicht – du kannst viel abfedern.',ok:['Wärmflasche oder Tee bringen','Aufgaben im Alltag übernehmen','Pläne locker halten'],no:['Großes Programm planen','Kommentare über ihre Laune']},
- foll:{m:[4,4,3,4],s:'Die Energie kommt zurück. Gute Tage für gemeinsame Pläne und Neues.',ok:['Ausflug oder Unternehmung planen','Zusammen Sport machen','Neue Ideen aufgreifen'],no:['Sie ausbremsen, wenn sie Lust auf Neues hat']},
- fert:{m:[4,4,4,4],s:'Sie ist oft offen, gesellig und gut gelaunt – und eine Schwangerschaft ist jetzt möglich.',ok:['Date-Abend oder etwas Schönes zu zweit','Komplimente machen','Kein Kinderwunsch: sicher verhüten'],no:['Sich auf die Rechnung als Verhütung verlassen']},
- ovu:{m:[5,5,5,5],s:'Rechnerisch der Höhepunkt: oft viel Energie, Selbstbewusstsein und Lust.',ok:['Zusammen etwas erleben','Zeit zu zweit einplanen','Kein Kinderwunsch: besonders sicher verhüten'],no:['Den Abend komplett verplanen – Zeit zu zweit lohnt sich']},
- lut:{m:[3,3,2,3],s:'Es wird ruhiger. Gemütlichkeit schlägt jetzt Großprogramm.',ok:['Couch-Abend, Film, gutes Essen','Für genug Schlaf sorgen','Termine nicht zu dicht packen'],no:['Spontane Großprojekte vorschlagen']},
- pms:{m:[2,1,2,2],s:'Die Stimmung kann jetzt schneller kippen – das liegt meist nicht an dir.',ok:['Extra Geduld, nichts persönlich nehmen','Lieblingssnack besorgen','Periodenprodukte checken'],no:['„Hast du deine Tage?“','Grundsatzdiskussionen anfangen']},
- late:{m:[2,2,2,2],s:'Die Periode lässt auf sich warten. Ein paar Tage Schwankung sind normal – ruhig bleiben.',ok:['Entspannt nachfragen, wie es ihr geht','Stress rausnehmen'],no:['Druck machen oder spekulieren']}
+ mens:{m:[1,2,2,1],s:'Die ersten Tage sind für viele die anstrengendsten: Krämpfe und Müdigkeit sind normal. Weniger erwarten, mehr abnehmen.',ok:['Einkauf, Kochen oder Termine übernehmen','Abende ruhig halten','Fragen, ob du was mitbringen sollst'],no:['Volles Wochenendprogramm planen','Ihre Laune kommentieren']},
+ foll:{m:[4,4,3,4],s:'Östrogen steigt, die Energie kommt zurück. Die beste Zeit im Monat für Pläne und Unternehmungen.',ok:['Ausflug oder Unternehmung vorschlagen','Größere Themen jetzt ansprechen','Zusammen Sport machen'],no:['Die guten Tage mit Couch-Wochenenden verschenken']},
+ fert:{m:[4,4,4,4],s:'Rund um den Eisprung haben viele die meiste Energie und sind besonders gesellig. Und Fakt: Jetzt ist eine Schwangerschaft möglich.',ok:['Etwas zusammen unternehmen','Freunde treffen, raus gehen','Kein Kinderwunsch: sicher verhüten'],no:['Die Rechnung als Verhütung nehmen – dafür ist sie zu ungenau']},
+ ovu:{m:[5,5,5,5],s:'Rechnerisch der Eisprung: Östrogen ist am Höchststand, für viele der Tag mit der meisten Energie.',ok:['Gute Tage für wichtige Gespräche und Pläne','Zusammen etwas erleben','Kein Kinderwunsch: besonders sicher verhüten'],no:['Die Rechnung als Verhütung nehmen – dafür ist sie zu ungenau']},
+ lut:{m:[3,3,2,3],s:'Progesteron übernimmt – das macht viele ruhiger und schneller müde. Weniger Programm, mehr Gemütlichkeit.',ok:['Ruhige Abende statt Großprogramm','Termine nicht zu dicht packen','Fragen, wie der Tag war – und zuhören'],no:['Spontan das ganze Wochenende verplanen']},
+ pms:{m:[2,1,2,2],s:'Östrogen und Progesteron fallen jetzt ab, viele sind dünnhäutiger. Wenn’s knirscht, liegt’s oft nicht an dir.',ok:['Nicht jede spitze Bemerkung persönlich nehmen','Heikle Themen auf nach der Periode schieben','Lieblingsessen mitbringen'],no:['„Hast du deine Tage?“ – nie eine gute Idee','Streit über Kleinigkeiten anfangen']},
+ late:{m:[2,2,2,2],s:'Ein paar Tage Verspätung sind häufig – Stress, Krankheit oder Reisen verschieben den Zyklus. Kein Grund zur Panik.',ok:['Gelassen bleiben','Ganz normal weitermachen'],no:['Ständig nachfragen','Wild spekulieren']}
 };
 const LEG=[['mens','Periode'],['foll','Follikelphase'],['fert','Fruchtbar'],['ovu','Eisprung'],['lut','Lutealphase'],['pms','Vor der Periode']];
 const SYM=['Krämpfe','Kopfweh','Müde','Gereizt','Heißhunger','Empfindlich','Gut drauf','Viel Energie'];
@@ -405,11 +406,11 @@ const emoGrid=(sel)=>EMO.map(e=>`<button type="button" data-e="${e}" class="${e=
 function renderPeople(){
  const T=T0();
  $('#people').innerHTML=S.persons.map(p=>{const inf=p.starts.length?info(p,T,T):null;
-  return `<button data-p="${p.id}" class="${p.id===S.active&&!adding?'on':''}"><span class="em">${esc(p.emoji)}</span>${esc(pname(p))}${inf?`<span class="pd" style="background:var(--${inf.ph})" title="${PH[inf.ph].n}"></span>`:''}</button>`}).join('')
-  +`<button class="add${adding?' on':''}" id="pAdd">+ Person</button>`;
+  return `<button data-p="${p.id}" class="${p.id===S.active&&!adding?'on':''}"><span class="em">${esc(p.emoji)}</span>${esc(pname(p))}${inf?`<span class="pd" style="background:var(--${inf.ph})" title="${PH[inf.ph].n}"></span>`:''}</button>`}).join('');
+ $('#people').hidden=S.persons.length<2;
 }
 $('#people').onclick=e=>{const b=e.target.closest('button');if(!b)return;
- if(b.id==='pAdd'){adding=true;location.hash='#heute'}else{adding=false;S.active=b.dataset.p;save()}
+ adding=false;S.active=b.dataset.p;save();
  sel=null;render()};
 
 /* ---------- Heute ---------- */
@@ -626,10 +627,10 @@ $('#calNeutral').onchange=e=>{S.cal.neutral=e.target.checked;save()};
 $('#calAll').onchange=e=>{S.cal.all=e.target.checked;save()};
 
 // Kalender-Export (.ics)
-const CALT={period:['Periode erwartet','🌙','Wärmflasche, Tee und Periodenprodukte bereithalten.',-300],
+const CALT={period:['Periode erwartet','🌙','Die ersten Tage sind oft anstrengend – Programm locker halten.',-300],
  fert:['Fruchtbare Tage – verhüten','🔶','Schwangerschaft möglich. Kein Kinderwunsch: nur mit sicherer Verhütung. Die Rechnung ist eine Schätzung.',480],
- mood:['Hochphase ✨','☀️','Oft besonders gute Laune und viel Energie – Zeit für ein Date.',480],
- pms:['Emotionale Tage (PMS)','🌧️','Extra Geduld, nichts persönlich nehmen, Lieblingssnack besorgen.',-600]};
+ mood:['Hochphase ✨','☀️','Oft viel Energie und gute Laune – gute Tage für gemeinsame Pläne.',480],
+ pms:['Emotionale Tage (PMS)','🌧️','Viele sind jetzt dünnhäutiger – nichts persönlich nehmen, Streit vertagen.',-600]};
 // Zeilen nach RFC 5545 auf max. 75 Byte umbrechen (Folgezeilen beginnen mit Leerzeichen), ohne Zeichen zu zerteilen
 function fold(l){const enc=new TextEncoder();if(enc.encode(l).length<=75)return l;
  const out=[];let cur='',n=0,max=75;
@@ -688,6 +689,7 @@ $('#impBtn').onclick=()=>{try{const o=JSON.parse($('#imp').value),d=o.data||o;
  const ok=x=>Array.isArray(x.starts)&&x.starts.every(s=>/^\d{4}-\d{2}-\d{2}$/.test(s));
  if(d.persons?!d.persons.length||!d.persons.every(ok):!ok(d))throw 0;
  S=migrate(d);save();$('#imp').value='';sel=null;render();toast('Backup wiederhergestellt')}catch(e){toast('Das sieht nicht nach einem gültigen Backup aus')}};
+$('#pNew').onclick=()=>{adding=true;sel=null;location.hash='#heute';render()};
 $('#rstBtn').onclick=e=>twoStep(e.target,'Alle Daten löschen','Wirklich alles löschen?',()=>{S=fresh();save();sel=null;adding=false;render();location.hash='#heute';toast('Alles gelöscht')});
 
 

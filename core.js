@@ -74,11 +74,11 @@
     const inf = info(p, T, T);
     if (!inf || inf.ph === 'late') return out;
     const d = inf.day, len = inf.len, ov = len - 14, [fs, fe] = fertRange(len, p.period, o.buffer);
-    if (d === len - 6) add('pms', 'pms-soon', 'in 2 Tagen beginnt die PMS-Zeit', 'Die Stimmung kann bald kippen. Extra Geduld einplanen, Lieblingssnack besorgen und große Diskussionen lieber verschieben.');
-    if (d === len - 4) add('pms', 'pms', 'PMS-Zeit', 'Bis zur Periode kann es jetzt emotionaler werden. Nichts persönlich nehmen – kleine Gesten wirken gerade doppelt.');
-    if (d === len) add('period', 'soon', 'Periode morgen erwartet', 'Wärmflasche, Tee und Periodenprodukte checken. Pläne für die nächsten Tage lieber locker halten.');
+    if (d === len - 6) add('pms', 'pms-soon', 'in 2 Tagen beginnt die PMS-Zeit', 'Bald fallen Östrogen und Progesteron ab, viele werden dann dünnhäutiger. Heikle Themen besser jetzt klären oder nach der Periode.');
+    if (d === len - 4) add('pms', 'pms', 'PMS-Zeit', 'Bis zur Periode sind viele gereizter. Wenn’s knirscht: nicht persönlich nehmen, Diskussionen vertagen.');
+    if (d === len) add('period', 'soon', 'Periode morgen erwartet', 'Die ersten Tage sind für viele die anstrengendsten. Die nächsten Tage nicht zu voll planen.');
     if (d === fs) add('fert', 'fert', 'fruchtbare Tage ab heute', `Bis ${fmt(inf.s + fe - 1)} ist eine Schwangerschaft möglich. Kein Kinderwunsch? Jetzt nur mit sicherer Verhütung – die Rechnung ist nur eine Schätzung.`);
-    if (d === ov - 2) add('mood', 'mood', 'Hochphase ✨', 'Rund um den Eisprung haben viele besonders gute Laune und viel Energie – perfekter Moment für ein Date oder etwas Spontanes.');
+    if (d === ov - 2) add('mood', 'mood', 'Hochphase ✨', 'Rund um den Eisprung haben viele die meiste Energie und gute Laune – gute Tage, um etwas zusammen zu unternehmen.');
     return out;
   }
 
