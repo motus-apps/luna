@@ -89,7 +89,7 @@
     if (d === len - 6) add('pms', 'pms-soon', 'in 2 Tagen beginnt die PMS-Zeit', 'Bald fallen Östrogen und Progesteron ab, viele werden dann dünnhäutiger. Heikle Themen besser jetzt klären oder nach der Periode.');
     if (d === len - 4) add('pms', 'pms', 'PMS-Zeit', 'Bis zur Periode sind viele gereizter. Wenn’s knirscht: nicht persönlich nehmen, Diskussionen vertagen.');
     if (d === len) add('period', 'soon', 'Periode morgen erwartet', 'Die ersten Tage sind für viele die anstrengendsten. Die nächsten Tage nicht zu voll planen.');
-    if (d === fs) add('fert', 'fert', 'fruchtbare Tage ab heute', `Bis ${fmt(inf.s + fe - 1)} ist eine Schwangerschaft möglich. Kein Kinderwunsch? Jetzt nur mit sicherer Verhütung – die Rechnung ist nur eine Schätzung.`);
+    if (d === fs && p.rel !== 'family') add('fert', 'fert', 'fruchtbare Tage ab heute', `Bis ${fmt(inf.s + fe - 1)} ist eine Schwangerschaft möglich. Kein Kinderwunsch? Jetzt nur mit sicherer Verhütung – die Rechnung ist nur eine Schätzung.`);
     if (d === ov - 2) add('mood', 'mood', 'Hochphase ✨', 'Rund um den Eisprung haben viele die meiste Energie und gute Laune – gute Tage, um etwas zusammen zu unternehmen.');
     return out;
   }
@@ -107,7 +107,7 @@
     for (const [s, len, c, logged] of cyc) {
       const ov = len - 14, [fs, fe] = fertRange(len, P, o.buffer);
       if (!logged && o.period !== false) out.push({ type: 'period', c, from: s, to: s + P - 1 });
-      if (o.fert !== false) out.push({ type: 'fert', c, from: s + fs - 1, to: s + fe - 1 });
+      if (o.fert !== false && p.rel !== 'family') out.push({ type: 'fert', c, from: s + fs - 1, to: s + fe - 1 });
       if (o.mood !== false) out.push({ type: 'mood', c, from: s + ov - 4, to: s + ov });
       if (o.pms !== false) out.push({ type: 'pms', c, from: s + len - 5, to: s + len - 1 });
     }
