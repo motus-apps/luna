@@ -72,6 +72,8 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .body-note{margin:0;color:var(--mut);font-size:15px}.body-note b{color:var(--ink);font-weight:600}
 .quiet{display:flex;flex-wrap:wrap;align-items:center;gap:0 14px;padding-top:12px;border-top:1px solid var(--line);font-size:15px;color:var(--mut)}
 .quiet button,.quiet a{min-height:44px;padding:0 2px;border:0;border-radius:6px;background:none;color:var(--ink);font:600 15px Figtree,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;display:inline-flex;align-items:center}
+.fixbox{padding-top:14px;border-top:1px solid var(--line)}.fixbox label{margin-top:0}
+.fixbox input[type=date]{max-width:220px}.fixbox .row{margin-top:4px}
 .week{margin-top:32px}.week h3{margin-bottom:12px}
 .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .days div{display:grid;justify-items:center;gap:6px}
@@ -311,7 +313,7 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
       <label class="chk"><input type="checkbox" data-n="fert"><span>Fruchtbare Tage – verhüten<small>Am ersten Tag des fruchtbaren Fensters</small></span></label>
       <label class="chk"><input type="checkbox" data-n="buffer"><span>Sicherheitspuffer für die fruchtbaren Tage<small>Fenster 3 Tage früher beginnen und 2 Tage später enden lassen</small></span></label>
       <label class="chk"><input type="checkbox" data-n="mood"><span>Hochphase – sehr gute Laune<small>Kurz vor dem Eisprung</small></span></label>
-      <label class="chk"><input type="checkbox" data-n="period"><span>Periode<small>Am Vortag, am erwarteten Tag und bei 3 Tagen Verspätung</small></span></label>
+      <label class="chk"><input type="checkbox" data-n="period"><span>Periode<small>Am Vortag und am erwarteten Tag</small></span></label>
     </div>
 
     <div class="card">
@@ -363,7 +365,7 @@ function migrate(o){
 }
 let canSave=true;
 function load(){try{const r=localStorage.getItem(KEY);return migrate(r&&JSON.parse(r))}catch(e){canSave=false;return fresh()}}
-let S=load(),adding=false;
+let S=load(),adding=false,lastFix=null;
 const P=()=>S.persons.find(p=>p.id===S.active)||S.persons[0];
 
 // IndexedDB-Spiegel für den Service Worker
@@ -463,7 +465,7 @@ function renderToday(){
  if(!p.starts.length)return renderSetup(v,p,false);
  const inf=info(p,T,T),L=avg(p),Pd=p.period,ph=PH[inf.ph],y=YOU[inf.ph],ns=nextStart(p,T),o=L-14,late=inf.ph==='late';
  let fs=inf.s+o-6,fe=inf.s+o;if(T>fe||late){fs=ns.n+o-6;fe=ns.n+o}
- const ov=fe-1,pmsS=ns.n-5,isStartToday=starts(p).includes(T),pmsNow=T>=pmsS&&T<ns.n,pl=(n,a,b)=>`${n} ${n===1?a:b}`;
+ const ov=fe-1,pmsS=ns.n-5,pmsNow=T>=pmsS&&T<ns.n,pl=(n,a,b)=>`${n} ${n===1?a:b}`;
  // Lage in einem Satz
  const st={
   mens:()=>Pd-inf.day>0?`Tag ${inf.day} der Periode · noch etwa ${pl(Pd-inf.day,'Tag','Tage')}`:`Tag ${inf.day} der Periode · voraussichtlich der letzte`,
@@ -475,10 +477,10 @@ function renderToday(){
  };st.ovu=st.fert;
  const mid=late?`<small>verspätet</small><b>+${ns.late}</b><small>${ns.late===1?'Tag':'Tage'}</small>`:`<small>Tag</small><b>${inf.day}</b><small>von ${inf.len}</small>`;
  const feel=['Energie','Laune','Lust','Gesellig'].map((l,i)=>`<div><small>${l}</small><i>${[1,2,3,4,5].map(k=>`<b class="${k<=y.m[i]?'f':''}"></b>`).join('')}</i></div>`).join('');
- // Periodenbeginn: dezent und nur rund um den erwarteten Termin
- let quiet='';
- if(isStartToday)quiet=`<div class="quiet"><span>Periodenbeginn eingetragen.</span><button id="undoStart">Rückgängig</button></div>`;
- else if(late||T>=ns.n-2)quiet=`<div class="quiet"><span>${late?'Periode da?':'Schon da?'}</span><button id="startNow">Heute eintragen</button><a href="#kalender">Anderer Tag</a></div>`;
+ // Kein Eintragen jedes Mal: Luna rechnet weiter, ab und zu korrigieren reicht
+ const quiet=lastFix&&lastFix.id===p.id
+  ?`<div class="quiet"><span>Korrigiert – Luna rechnet ab ${fmt(lastFix.n,{day:'numeric',month:'long'})} weiter.</span><button id="fixUndo">Rückgängig</button></div>`
+  :`<div class="quiet" id="fixBox"><span>Rechnung passt nicht mehr?</span><button id="fixOpen">Zyklus korrigieren</button></div>`;
  // die nächsten 7 Tage
  const days=[],changes=[];let prev=inf.ph;
  for(let k=0;k<7;k++){const n=T+k,d=info(p,n,T),phk=d?d.ph:'late';
@@ -508,11 +510,22 @@ function renderToday(){
   <ul class="next">${changes.join('')||`<li style="--pc:var(--${inf.ph})"><i></i><span>${ph.n} geht die ganze Woche weiter</span></li>`}</ul></div>
  <div class="grid">${cards.map(c=>`<div class="card"><small>${c[0]}</small><strong>${c[1]}</strong><span>${c[2]}</span></div>`).join('')}</div>
  <div class="up"><h3>Die nächsten Perioden</h3><ol>${ups}</ol>
- <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${p.auto&&gaps(p).length?' (Ø aus dem Verlauf)':''} und ${Pd} Tagen Periode. Alles Schätzungen – jede ist anders, einfach fragen hilft am meisten.</p></div>`;
+ <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${p.auto&&gaps(p).length?' (Ø aus dem Verlauf)':''} und ${Pd} Tagen Periode, zuletzt abgeglichen am ${fmt(starts(p).at(-1),{day:'numeric',month:'long',year:'numeric'})}. Alles Schätzungen – jede ist anders, einfach fragen hilft am meisten.</p></div>`;
  $('#moreLink').onclick=()=>{wantScroll=SEASON[inf.ph]};
- const sn=$('#startNow'),un=$('#undoStart');
- if(sn)sn.onclick=()=>{if(addStart(p,T)){toast('Neuer Zyklus gestartet');render()}};
- if(un)un.onclick=()=>{delStart(p,toS(T));toast('Eintrag entfernt');render()};
+ const fo=$('#fixOpen'),fu=$('#fixUndo');
+ if(fu)fu.onclick=()=>{p.starts=lastFix.prev;lastFix=null;save();toast('Korrektur zurückgenommen');render()};
+ if(fo)fo.onclick=()=>{const box=$('#fixBox');box.className='fixbox';
+  box.innerHTML=`<label for="fixDate">Wann hat die letzte Periode begonnen?</label>
+   <div class="row"><input type="date" id="fixDate" max="${toS(T)}" value="${toS(Math.min(inf.s,T))}"><button class="pri" id="fixSave">Übernehmen</button><button class="ghost" id="fixCancel">Abbrechen</button></div>
+   <p class="hint">Ungefähr reicht. Luna rechnet von dort aus weiter – einfach ab und zu nachjustieren.</p>`;
+  $('#fixDate').focus();
+  $('#fixCancel').onclick=()=>renderToday();
+  $('#fixSave').onclick=()=>{const v=$('#fixDate').value;if(!v||toN(v)>T){toast('Bitte ein Datum bis heute wählen');return}
+   const n=toN(v),prev=[...p.starts];
+   // Einträge in der Nähe ersetzen statt doppelt anlegen
+   p.starts=p.starts.filter(x=>Math.abs(toN(x)-n)>10);addStart(p,n);
+   if(prev.length===p.starts.length&&prev.every((x,i)=>x===p.starts[i])){toast('Passt schon so');renderToday();return}
+   lastFix={id:p.id,n,prev};save();toast('Zyklus korrigiert');render()}};
  bindBanner();
 }
 

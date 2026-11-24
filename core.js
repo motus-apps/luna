@@ -9,7 +9,12 @@
   const starts = p => [...new Set(p.starts)].map(toN).sort((a, b) => a - b);
   const gaps = p => {
     const s = starts(p), g = [];
-    for (let i = 1; i < s.length; i++) { const d = s[i] - s[i - 1]; if (d >= 15 && d <= 60) g.push(d); }
+    // Einträge sind nur gelegentliche Korrekturen: Eine große Lücke (z. B. 56 Tage) zählt als mehrere Zyklen
+    const ref = p.cycle || 28;
+    for (let i = 1; i < s.length; i++) {
+      const d = s[i] - s[i - 1], k = d > ref * 1.6 ? Math.round(d / ref) : 1, len = Math.round(d / k);
+      if (d >= 15 && d <= 400 && len >= 18 && len <= 60) g.push(len);
+    }
     return g;
   };
   const avg = p => {
@@ -38,19 +43,20 @@
     let s = st[i], len, proj = false;
     if (i < st.length - 1) len = st[i + 1] - s;
     else {
+      // ohne neuen Eintrag läuft die Rechnung einfach Zyklus für Zyklus weiter
       len = L;
-      const a = T > s + L ? T + 1 : s + L;
-      if (n >= a) { s = a + Math.floor((n - a) / L) * L; proj = true; }
+      if (n >= s + L) { s += Math.floor((n - s) / L) * L; proj = true; }
     }
     const day = n - s + 1;
     return { s, len, day, proj, ph: phase(day, len, p.period) };
   }
 
+  // nächster Periodenbeginn ab heute (heute eingeschlossen); late bleibt aus Kompatibilität immer 0
   function nextStart(p, T = T0()) {
     const st = starts(p);
     if (!st.length) return null;
     const s = st[st.length - 1], L = avg(p);
-    return T > s + L ? { n: T + 1, late: T - (s + L) } : { n: s + L, late: 0 };
+    return { n: T <= s ? s + L : s + Math.ceil((T - s) / L) * L, late: 0 };
   }
 
   // fruchtbares Fenster als Zyklustage (mit optionalem Sicherheitspuffer)
@@ -69,10 +75,9 @@
     const add = (type, id, title, body) => {
       if (o[type] !== false) out.push({ key: p.id + ':' + id + ':' + toS(T), type, title: who(p) + ' · ' + title, body });
     };
-    if (T === last + L) add('period', 'due', 'Periode heute erwartet', 'Schon losgegangen? Kurz in Luna eintragen – dann stimmen die nächsten Prognosen.');
-    if (T - (last + L) === 3) add('period', 'late', 'Periode 3 Tage verspätet', 'Ein paar Tage Schwankung sind normal – Stress, Krankheit oder Reisen verschieben den Zyklus. Wenn sie begonnen hat: in Luna eintragen.');
     const inf = info(p, T, T);
     if (!inf || inf.ph === 'late') return out;
+    if (inf.proj && inf.day === 1) add('period', 'due', 'Periode heute erwartet', 'Laut Rechnung beginnt heute die Periode. Ein paar Tage früher oder später sind normal.');
     const d = inf.day, len = inf.len, ov = len - 14, [fs, fe] = fertRange(len, p.period, o.buffer);
     if (d === len - 6) add('pms', 'pms-soon', 'in 2 Tagen beginnt die PMS-Zeit', 'Bald fallen Östrogen und Progesteron ab, viele werden dann dünnhäutiger. Heikle Themen besser jetzt klären oder nach der Periode.');
     if (d === len - 4) add('pms', 'pms', 'PMS-Zeit', 'Bis zur Periode sind viele gereizter. Wenn’s knirscht: nicht persönlich nehmen, Diskussionen vertagen.');
@@ -87,13 +92,14 @@
     const st = starts(p);
     if (!st.length) return [];
     // c = fortlaufende Zyklusnummer: bleibt gleich, wenn sich die Prognose verschiebt (stabile Kalender-IDs)
-    const last = st[st.length - 1], L = avg(p), P = p.period, ns = nextStart(p, T), cyc = [], n0 = st.length;
-    if (!ns.late && T < last + L) cyc.push([last, L, true, n0 - 1]);
-    for (let k = 0; k < count; k++) cyc.push([ns.n + k * L, L, false, n0 + k]);
+    // laufender Zyklus (eingetragen oder weitergerechnet) plus die nächsten
+    const last = st[st.length - 1], L = avg(p), P = p.period, cyc = [], n0 = st.length;
+    const k0 = Math.max(0, Math.floor((T - last) / L)), cur = last + k0 * L;
+    for (let k = 0; k <= count; k++) cyc.push([cur + k * L, L, n0 - 1 + k0 + k, k0 + k === 0]);
     const out = [];
-    for (const [s, len, running, c] of cyc) {
+    for (const [s, len, c, logged] of cyc) {
       const ov = len - 14, [fs, fe] = fertRange(len, P, o.buffer);
-      if (!running && o.period !== false) out.push({ type: 'period', c, from: s, to: s + P - 1 });
+      if (!logged && o.period !== false) out.push({ type: 'period', c, from: s, to: s + P - 1 });
       if (o.fert !== false) out.push({ type: 'fert', c, from: s + fs - 1, to: s + fe - 1 });
       if (o.mood !== false) out.push({ type: 'mood', c, from: s + ov - 4, to: s + ov });
       if (o.pms !== false) out.push({ type: 'pms', c, from: s + len - 5, to: s + len - 1 });
