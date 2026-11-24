@@ -27,7 +27,7 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.08;mar
 h2{font-size:clamp(30px,5vw,44px)}h3{font-size:21px}
 .wrap{max-width:1080px;margin:0 auto;padding:0 max(4vw,16px)}
 header{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;padding:20px 0 8px}
-.brand{margin-right:auto;font:600 24px Fraunces,serif;display:flex;align-items:center;gap:10px}
+.brand{color:var(--ink);text-decoration:none;border-radius:12px;margin-right:auto;font:600 24px Fraunces,serif;display:flex;align-items:center;gap:10px}
 .brand img{border-radius:9px;display:block}
 nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;overflow-x:auto}
 nav a{flex:none;padding:9px 16px;border-radius:999px;color:var(--mut);text-decoration:none;font-weight:500;min-height:40px}
@@ -175,7 +175,7 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
 <body>
 <div class="wrap">
 <header>
-  <div class="brand"><img src="icons/icon.svg" alt="" width="34" height="34">Luna</div>
+  <a class="brand" href="#heute" aria-label="Luna – zur Startseite"><img src="icons/icon.svg" alt="" width="34" height="34">Luna</a>
   <nav id="nav">
     <a href="#heute" data-v="heute"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="3.5" r="2" fill="currentColor"/></svg><span>Heute</span></a>
     <a href="#kalender" data-v="kalender"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Kalender</span></a>
@@ -670,6 +670,7 @@ function route(){const h=location.hash.slice(1),v=VIEWS.includes(h)?h:'heute';
  if(v==='wissen'){drawHorm();if(wantScroll){const el=$('#wi-'+wantScroll);wantScroll=null;if(el)setTimeout(()=>el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),60)}}else scrollTo(0,0)}
 function render(){renderPeople();renderToday();renderCal();renderWissen();renderHist();renderSet();foot()}
 addEventListener('hashchange',route);
+document.querySelector('.brand').onclick=()=>{if(adding){adding=false;render()}if(location.hash==='#heute'||!location.hash)scrollTo(0,0)};
 render();route();mirror();loadInbox();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(async()=>{if(S.notify.on){bgSync=await regPeriodic();renderNotify()}swCheck()}).catch(()=>{});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){render();swCheck();loadInbox()}});
