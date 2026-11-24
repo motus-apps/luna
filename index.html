@@ -105,6 +105,8 @@ textarea{min-height:90px;resize:vertical}
 .chk small{display:block;color:var(--mut);font-weight:400;font-size:14px}
 .status{margin-top:12px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--foll) 14%,var(--card));font-size:14px}
 .status.warn{background:color-mix(in srgb,var(--fert) 18%,var(--card))}
+.banner{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:22px;padding:16px 20px;border-radius:20px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--lut)}
+.banner b{display:block;font:600 19px/1.25 Fraunces,serif}.banner p{margin:4px 0 0;color:var(--mut);font-size:15px;max-width:56ch}
 .note{font-size:13px;color:var(--mut);margin-top:40px;max-width:70ch}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;transition:.25s;pointer-events:none;font-weight:500;max-width:90vw}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -181,10 +183,14 @@ textarea{min-height:90px;resize:vertical}
 
     <div class="card">
       <h3>Im Kalender erinnern</h3>
-      <p class="hint">Der zuverlässigste Weg zu Erinnerungen zur festen Uhrzeit: Luna legt die nächsten 6 Zyklen als Termine mit Erinnerung in deinem Handy-Kalender an. Nach Änderungen einfach neu exportieren.</p>
+      <p class="hint">Luna trägt die wichtigen Tage der nächsten 6 Zyklen als Termine mit Erinnerung in deinen Handy-Kalender ein – zuverlässig zur festen Uhrzeit, auch wenn Luna nicht läuft.</p>
+      <label class="chk"><input type="checkbox" id="calOn"><span>Wichtige Tage im Kalender anzeigen<small>Ändert sich die Prognose, bietet Luna beim Öffnen an, den Kalender zu aktualisieren</small></span></label>
+      <div id="calOpts">
       <label class="chk"><input type="checkbox" id="calNeutral"><span>Neutrale Titel<small>Nur Symbol und „Luna“, kein Name, keine Phase – falls der Kalender mit anderen geteilt oder in der Cloud gespeichert wird</small></span></label>
       <label class="chk"><input type="checkbox" id="calAll"><span>Alle Personen exportieren<small>Sonst nur die gerade ausgewählte</small></span></label>
-      <div class="row" style="margin-top:14px"><button id="calBtn">In Kalender übernehmen</button></div>
+      <div class="row" style="margin-top:14px"><button id="calBtn">Jetzt in Kalender übernehmen</button></div>
+      <p class="hint" id="calState"></p>
+      </div>
     </div>
 
     <div class="card">
@@ -216,7 +222,7 @@ const clamp=(x,a,b)=>Math.min(b,Math.max(a,Math.round(x)));
 const uid=()=>Math.random().toString(36).slice(2,9);
 const EMO=['🌸','🌙','🌷','🦋','✨','💜','🌻','🍓','🌊','🌿','☀️','🔥','💐','👑','🐱','🍒'];
 const person=(o={})=>({id:uid(),name:'',emoji:'🌸',starts:[],cycle:28,period:5,auto:true,notes:{},...o});
-const fresh=()=>{const p=person();return{v:2,persons:[p],active:p.id,notify:{on:false,pms:true,fert:true,buffer:true,mood:true,period:true},cal:{neutral:false,all:true}}};
+const fresh=()=>{const p=person();return{v:2,persons:[p],active:p.id,notify:{on:false,pms:true,fert:true,buffer:true,mood:true,period:true},cal:{on:false,dismissed:false,neutral:false,all:true,seq:0,hash:''}}};
 function migrate(o){
  if(!o)return fresh();
  if(!o.persons){const p=person({starts:o.starts||[],cycle:o.cycle||28,period:o.period||5,auto:o.auto!==false,notes:o.notes||{}});const f=fresh();f.persons=[p];f.active=p.id;return f}
@@ -293,8 +299,20 @@ function renderSetup(v,p,isNew){
   q.name=$('#iName').value.trim();q.emoji=($('#iEmo .on')||{}).dataset?.e||'🌸';
   q.cycle=clamp(+$('#iCyc').value||28,20,45);q.period=clamp(+$('#iPer').value||5,2,10);
   if(isNew){S.persons.push(q);S.active=q.id}
-  adding=false;addStart(q,toN(d));save();toast('Gespeichert');render()};
+  adding=false;addStart(q,toN(d));save();toast('Gespeichert');render();scrollTo(0,0)};
  const c=$('#iCancel');if(c)c.onclick=()=>{adding=false;render()};
+}
+function calBanner(){
+ if(!S.persons.some(p=>p.starts.length))return'';
+ if(!S.cal.on)return S.cal.dismissed?'':`<div class="banner"><div><b>Wichtige Tage auch im Kalender?</b><p>Emotionale Tage, fruchtbare Tage, Hochphase und Periode als Termine mit Erinnerung – zuverlässig, auch wenn Luna nicht läuft.</p></div><div class="row"><button class="pri" id="bYes">Ja, eintragen</button><button class="ghost" id="bNo">Nein danke</button></div></div>`;
+ const h=calHash();if(!h||h===S.cal.hash)return'';
+ return `<div class="banner"><div><b>${S.cal.hash?'Die Prognose hat sich geändert':'Kalender noch nicht eingetragen'}</b><p>${S.cal.hash?'Ein Tipp, und die Termine im Kalender passen wieder.':'Ein Tipp, und die nächsten 6 Zyklen stehen mit Erinnerung im Kalender.'}</p></div><div class="row"><button class="pri" id="bUpd">${S.cal.hash?'Kalender aktualisieren':'Jetzt eintragen'}</button></div></div>`;
+}
+function bindBanner(){
+ const y=$('#bYes'),n=$('#bNo'),u=$('#bUpd');
+ if(y)y.onclick=()=>{S.cal.on=true;S.cal.dismissed=true;save();exportCal()};
+ if(n)n.onclick=()=>{S.cal.dismissed=true;save();render();toast('Okay – lässt sich jederzeit in den Einstellungen einschalten')};
+ if(u)u.onclick=exportCal;
 }
 function renderToday(){
  const v=$('#v-heute'),T=T0(),p=P();
@@ -311,7 +329,7 @@ function renderToday(){
   ['Emotionale Tage',pmsNow?'jetzt':inDays(pmsS-T),`ab ${wd(pmsS)}`]
  ];
  const ups=[0,1,2].map(k=>ns.n+k*L).map(n=>`<li><b>${fmt(n,{weekday:'long',day:'numeric',month:'long'})}</b><span>bis ${fmt(n+Pd-1,{day:'numeric',month:'short'})} · ${inDays(n-T)}</span></li>`).join('');
- v.innerHTML=`<div class="hero" style="--pc:var(--${inf.ph})">
+ v.innerHTML=calBanner()+`<div class="hero" style="--pc:var(--${inf.ph})">
   <div><div class="ring">${ringSVG(p,inf.day,inf.len)}<div class="mid">${mid}</div></div><div class="legend">${legend()}</div></div>
   <div><span class="tag">${p.name?esc(p.emoji+' '+p.name)+' · ':''}${fmt(T,{weekday:'long',day:'numeric',month:'long'})}</span>
    <h2 style="margin-top:10px">${ph.n}</h2><p class="lead">${ph.t}</p>
@@ -322,6 +340,7 @@ function renderToday(){
  <div class="up"><h3>Die nächsten Perioden</h3><ol>${ups}</ol>
  <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${p.auto&&gaps(p).length?' (Ø aus dem Verlauf)':''} und ${Pd} Tagen Periode.</p></div>`;
  $('#startNow').onclick=()=>{if(addStart(p,T)){toast('Neuer Zyklus gestartet');render()}};
+ bindBanner();
 }
 
 /* ---------- Kalender ---------- */
@@ -419,6 +438,8 @@ function renderSet(){
  $('#sCyc').value=p.cycle;$('#sPer').value=p.period;$('#sAuto').checked=p.auto;
  const g=gaps(p);$('#autoHint').textContent=p.auto?(g.length?`Aktuell: ${avg(p)} Tage (Ø aus ${Math.min(6,g.length)} Zyklen)`:'Noch kein ganzer Zyklus erfasst – bis dahin gilt der Wert oben'):'Es gilt immer der Wert oben';
  $('#pDel').hidden=S.persons.length<2;
+ $('#calOn').checked=S.cal.on;$('#calOpts').hidden=!S.cal.on;
+ const ch=calHash();$('#calState').textContent=!S.cal.hash?'Noch nicht übernommen.':ch===S.cal.hash?'Kalender ist auf dem neuesten Stand.':'Die Prognose hat sich seit dem letzten Übernehmen geändert.';
  $('#calNeutral').checked=S.cal.neutral;$('#calAll').checked=S.cal.all;$('#calAll').closest('label').hidden=S.persons.length<2;
  renderNotify();
 }
@@ -436,7 +457,7 @@ const CALT={period:['Periode erwartet','🌙','Wärmflasche, Tee und Periodenpro
  fert:['Fruchtbare Tage – verhüten','🔶','Schwangerschaft möglich. Kein Kinderwunsch: nur mit sicherer Verhütung. Die Rechnung ist eine Schätzung.',480],
  mood:['Hochphase ✨','☀️','Oft besonders gute Laune und viel Energie – Zeit für ein Date.',480],
  pms:['Emotionale Tage (PMS)','🌧️','Extra Geduld, nichts persönlich nehmen, Lieblingssnack besorgen.',-600]};
-function ics(){
+function ics(seq=S.cal.seq){
  const T=T0(),list=S.cal.all?S.persons:[P()],d8=n=>toS(n).replace(/-/g,''),stamp=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
  const icEsc=s=>s.replace(/[\\,;]/g,m=>'\\'+m).replace(/\n/g,'\\n');
  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Luna//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
@@ -445,18 +466,23 @@ function ics(){
   for(const x of C.spans(p,S.notify,6,T)){const [t,sym,desc,mins]=CALT[x.type];
    const title=S.cal.neutral?`${sym} Luna`:`${C.who(p)} · ${t}`;
    const trig=mins<0?`-PT${-mins}M`:`PT${mins}M`;
-   L.push('BEGIN:VEVENT',`UID:luna-${p.id}-${x.type}-${d8(x.from)}@luna`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${d8(x.from)}`,`DTEND;VALUE=DATE:${d8(x.to+1)}`,
+   L.push('BEGIN:VEVENT',`UID:luna-${p.id}-${x.type}-${x.c}@luna`,`DTSTAMP:${stamp}`,`SEQUENCE:${seq}`,`DTSTART;VALUE=DATE:${d8(x.from)}`,`DTEND;VALUE=DATE:${d8(x.to+1)}`,
     `SUMMARY:${icEsc(title)}`,...(S.cal.neutral?[]:[`DESCRIPTION:${icEsc(desc)}`]),'TRANSP:TRANSPARENT',
     'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${icEsc(title)}`,`TRIGGER:${trig}`,'END:VALARM','END:VEVENT');cnt++}}
  L.push('END:VCALENDAR');return cnt?L.join('\r\n'):null;
 }
-$('#calBtn').onclick=async()=>{
- const txt=ics();if(!txt)return toast('Noch keine Daten zum Exportieren');
+// Fingerabdruck der Termine (ohne Zeitstempel/Version), um Änderungen zu erkennen
+function calHash(){const t=ics(0);if(!t)return'';const b=t.split('\r\n').filter(l=>!/^(DTSTAMP|SEQUENCE)/.test(l)).join('|');let h=5381;for(let i=0;i<b.length;i++)h=(h*33^b.charCodeAt(i))>>>0;return h.toString(36)}
+async function exportCal(){
+ const seq=S.cal.seq+1,txt=ics(seq);if(!txt){toast('Noch keine Daten zum Exportieren');return}
+ const done=()=>{S.cal.seq=seq;S.cal.hash=calHash();save();render()};
  const file=new File([txt],'luna.ics',{type:'text/calendar'});
- try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Luna'});return}}catch(e){if(e.name==='AbortError')return}
+ try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Luna'});done();return}}catch(e){if(e.name==='AbortError')return}
  const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download='luna.ics';document.body.appendChild(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('luna.ics gespeichert – öffnen, um die Termine zu übernehmen');
-};
+ setTimeout(()=>URL.revokeObjectURL(a.href),5000);done();toast('luna.ics gespeichert – öffnen, um die Termine zu übernehmen');
+}
+$('#calBtn').onclick=exportCal;
+$('#calOn').onchange=e=>{S.cal.on=e.target.checked;if(S.cal.on)S.cal.dismissed=true;save();render()};
 
 // Backup
 const backup=()=>JSON.stringify({app:'luna',v:2,data:S});

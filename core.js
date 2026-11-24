@@ -86,16 +86,17 @@
   function spans(p, o, count = 6, T = T0()) {
     const st = starts(p);
     if (!st.length) return [];
-    const last = st[st.length - 1], L = avg(p), P = p.period, ns = nextStart(p, T), cyc = [];
-    if (!ns.late && T < last + L) cyc.push([last, L, true]);
-    for (let k = 0; k < count; k++) cyc.push([ns.n + k * L, L, false]);
+    // c = fortlaufende Zyklusnummer: bleibt gleich, wenn sich die Prognose verschiebt (stabile Kalender-IDs)
+    const last = st[st.length - 1], L = avg(p), P = p.period, ns = nextStart(p, T), cyc = [], n0 = st.length;
+    if (!ns.late && T < last + L) cyc.push([last, L, true, n0 - 1]);
+    for (let k = 0; k < count; k++) cyc.push([ns.n + k * L, L, false, n0 + k]);
     const out = [];
-    for (const [s, len, running] of cyc) {
+    for (const [s, len, running, c] of cyc) {
       const ov = len - 14, [fs, fe] = fertRange(len, P, o.buffer);
-      if (!running && o.period !== false) out.push({ type: 'period', from: s, to: s + P - 1 });
-      if (o.fert !== false) out.push({ type: 'fert', from: s + fs - 1, to: s + fe - 1 });
-      if (o.mood !== false) out.push({ type: 'mood', from: s + ov - 4, to: s + ov });
-      if (o.pms !== false) out.push({ type: 'pms', from: s + len - 5, to: s + len - 1 });
+      if (!running && o.period !== false) out.push({ type: 'period', c, from: s, to: s + P - 1 });
+      if (o.fert !== false) out.push({ type: 'fert', c, from: s + fs - 1, to: s + fe - 1 });
+      if (o.mood !== false) out.push({ type: 'mood', c, from: s + ov - 4, to: s + ov });
+      if (o.pms !== false) out.push({ type: 'pms', c, from: s + len - 5, to: s + len - 1 });
     }
     return out.filter(x => x.to >= T);
   }
