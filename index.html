@@ -89,11 +89,25 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .ideas li{border-left:3px solid var(--fert);padding:2px 0 2px 12px}.ideas p{margin:2px 0 0}.ideas small{color:var(--mut)}
 .tip{margin-top:16px;padding:14px 18px;border-radius:18px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pc)}
 .tip b{font-size:13px;color:var(--mut);font-weight:600}.tip p{margin:4px 0 0;font-size:16px;line-height:1.45}.tip .more{font-size:14px;display:inline-block;margin-top:6px}
-.idc{margin-bottom:20px}.idrow{margin-top:10px;flex-wrap:nowrap}.idrow input{flex:1;min-width:0}
-.idl{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
-.idl li{display:flex;align-items:center;gap:10px;padding:4px 4px 4px 12px;border:1px solid var(--line);border-radius:14px}
-.idl .em{font-size:20px}.idl .tx{flex:1;min-width:0;overflow-wrap:anywhere}.idl button{min-height:44px;width:44px;padding:0;border:0;flex:none}
-.idl li.done .tx{text-decoration:line-through;color:var(--mut)}
+.idc{margin-bottom:20px}
+.mk-add{display:flex;align-items:center;gap:6px;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:4px;background:var(--bg)}
+.mk-add input[type=text]{flex:1;min-width:0;border:0;background:none;padding:8px 4px;font-size:16px}.mk-add input:focus{outline:none}
+.mk-add:focus-within{border-color:var(--ink)}
+.mk-cat,.mk-plus{min-height:40px;width:40px;padding:0;border:0;border-radius:10px;flex:none;font-size:18px;background:var(--card)}
+.mk-plus{background:var(--ink);color:var(--bg);font-size:22px;font-weight:500}
+.mk-cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mk-cats button{min-height:36px;padding:4px 12px;font-size:14px;font-weight:500;gap:6px}.mk-cats button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mk-filter{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px}
+.mk-filter button{min-height:32px;padding:2px 12px;font-size:14px;font-weight:500;flex:none}.mk-filter button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mk{list-style:none;margin:8px 0 0;padding:0}
+.mk li{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);min-height:44px}
+.mk li.gh{min-height:0;border:0;padding:12px 0 2px;font-size:13px;font-weight:600;color:var(--mut)}
+.mk .ck{display:flex;align-items:center;justify-content:center;width:36px;min-height:44px;margin:0;flex:none;cursor:pointer}
+.mk .ck input{width:18px;height:18px;margin:0;accent-color:var(--ink)}
+.mk .tx{flex:1;min-width:0;min-height:44px;padding:6px 4px;border:0;border-radius:8px;background:none;font:400 15px/1.35 Figtree,sans-serif;text-align:left;justify-content:flex-start;overflow-wrap:anywhere;white-space:normal}
+.mk .x{min-height:44px;width:36px;padding:0;border:0;background:none;color:var(--mut);font-size:13px;flex:none;opacity:.6}
+.mk li.done .tx{text-decoration:line-through;color:var(--mut)}
+.mk li.ed{display:block;padding:8px 0 12px}.mk-edit input[type=text]{width:100%}
 .iddone{margin-top:12px}.iddone summary{cursor:pointer;color:var(--mut);font-size:14px;min-height:32px}
 .revl{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}.revl small{color:var(--mut)}.revl p{margin:2px 0 0}
 .week{margin-top:32px}.week h3{margin-bottom:12px}
@@ -520,7 +534,7 @@ const TIPS={
 TIPS.ovu=TIPS.fert;TIPS.late=TIPS.lut;
 function tipOf(p,ph,T){const l=TIPS[ph].filter(t=>!(t[1]&&fam(p)));return l[T%l.length][0]}
 // Ideen-Liste pro Person
-const IDT={gift:['🎁','Geschenk'],food:['🍫','Essen & Snacks'],place:['📍','Ausflug & Restaurant'],misc:['💬','Sonstiges']};
+const IDT={gift:['🎁','Geschenke'],food:['🍫','Essen & Snacks'],place:['📍','Ausflüge & Restaurants'],media:['📚','Bücher, Filme & Musik'],misc:['💬','Sonstiges']};
 // Rückblick: einmalige Ereignisse in den letzten Zyklen
 function reviews(p,T,max=3){const inf=info(p,T,T);if(!inf)return[];const out=[];let s=inf.s;
  for(let k=0;k<max;k++){const pi=info(p,s-1,T);if(!pi)break;const a=pi.s,e=s-1;
@@ -641,7 +655,7 @@ function renderToday(){
   if(k&&phk!==prev)changes.push(`<li style="--pc:var(--${phk})"><i></i><b>${dl}</b><span>${phk==='mens'?'Periode erwartet':phN(p,phk)}</span></li>`);
   prev=phk}
  {const gifts=(p.ideas||[]).filter(i=>i.t==='gift'&&!i.done).length,occ=[0,1,2,3,4,5,6].some(k=>evOn(p,T+k).some(e=>['geb','jt','hz'].includes(e.t)));
-  if(gifts&&occ)changes.push(`<li><i class="ev" aria-hidden="true">🎁</i><b>Ideen</b><span><a class="more" href="#verlauf">${gifts} ${gifts===1?'Geschenkidee':'Geschenkideen'} notiert</a></span></li>`)}
+  if(gifts&&occ)changes.push(`<li><i class="ev" aria-hidden="true">🎁</i><b>Ideen</b><span><a class="more" href="#verlauf">${gifts} ${gifts===1?'Geschenkidee':'Geschenkideen'} auf der Merkliste</a></span></li>`)}
  const cards=[
   ['Nächste Periode',late?'überfällig':inDays(ns.n-T),late?`seit ${pl(ns.late,'Tag','Tagen')}`:wd(ns.n)],
   ['Fruchtbares Fenster',T>=fs&&T<=fe?'jetzt':inDays(fs-T),`${fmt(fs,{day:'numeric',month:'short'})} – ${fmt(fe,{day:'numeric',month:'short'})}`],
@@ -753,25 +767,42 @@ function renderHist(){
  const rv=reviews(p,T,3);
  $('#revCard').innerHTML=rv.length?`<div class="card mu"><h3>Rückblick</h3><ul class="revl">${rv.map(r=>`<li><small>${fmt(r.a,{day:'numeric',month:'short'})} – ${fmt(r.e,{day:'numeric',month:'short'})}</small><p>${reviewLine(p,r,T)}</p></li>`).join('')}</ul></div>`:'';
 }
-let ideaT='gift';
+// Merkliste: eine Zeile zum Eintippen, Kategorie optional, kompakt gruppiert, Tippen zum Bearbeiten
+let ideaT='misc',ideaF='all',ideaEdit=null,catOpen=false;
+const catBtns=(cur,attr)=>Object.entries(IDT).map(([k,v])=>`<button class="${k===cur?'on':''}" ${attr}="${k}" aria-pressed="${k===cur}" title="${v[1]}">${v[0]}<span>${v[1]}</span></button>`).join('');
 function renderIdeas(p){
- const open=p.ideas.filter(i=>!i.done),done=p.ideas.filter(i=>i.done);
- const li=i=>`<li class="${i.done?'done':''}"><span class="em" aria-hidden="true">${IDT[i.t][0]}</span><span class="tx">${esc(i.x)}</span>
-  <button class="ghost" data-ido="${i.id}" aria-label="${i.done?'Wieder offen':'Erledigt'}" title="${i.done?'Wieder offen':'Erledigt'}">${i.done?'↺':'✓'}</button><button class="ghost" data-idd="${i.id}" aria-label="Löschen">✕</button></li>`;
- $('#ideas').innerHTML=`<h3>Ideen für ${p.name?esc(p.name):'sie'}</h3><p class="hint">Was sie nebenbei erwähnt – damit es beim nächsten Anlass parat ist.</p>
-  <div class="chips" id="ideaType" style="margin-top:12px">${Object.entries(IDT).map(([k,v])=>`<button data-it="${k}" class="${k===ideaT?'on':''}" aria-pressed="${k===ideaT}">${v[0]} ${v[1]}</button>`).join('')}</div>
-  <div class="row idrow"><input type="text" id="ideaTxt" maxlength="120" placeholder="z. B. Kopfhörer, Lieblingsschokolade, das Thai-Restaurant …" aria-label="Neue Idee"><button id="ideaAdd">Merken</button></div>
-  ${open.length?`<ul class="idl">${open.map(li).join('')}</ul>`:''}
-  ${done.length?`<details class="iddone"><summary>Erledigt (${done.length})</summary><ul class="idl">${done.map(li).join('')}</ul></details>`:''}`;
+ const open=p.ideas.filter(i=>!i.done),done=p.ideas.filter(i=>i.done),used=Object.keys(IDT).filter(k=>open.some(i=>i.t===k));
+ if(ideaF!=='all'&&!used.includes(ideaF))ideaF='all';
+ const row=i=>ideaEdit===i.id
+  ?`<li class="ed"><div class="mk-edit"><input type="text" id="ideaEd" value="${esc(i.x)}" maxlength="120" aria-label="Idee bearbeiten"><div class="mk-cats">${catBtns(i.t,'data-ect')}</div>
+    <div class="row"><button class="pri" id="ideaSave">Fertig</button><button class="ghost danger" data-idd="${i.id}">Löschen</button></div></div></li>`
+  :`<li class="${i.done?'done':''}"><label class="ck"><input type="checkbox" data-ido="${i.id}" ${i.done?'checked':''} aria-label="${esc(i.x)} erledigt"></label>
+    <button class="tx" data-ide="${i.id}">${ideaF==='all'&&!i.done?'':IDT[i.t][0]+' '}${esc(i.x)}</button><button class="x" data-idd="${i.id}" aria-label="${esc(i.x)} löschen">✕</button></li>`;
+ const shown=ideaF==='all'?open:open.filter(i=>i.t===ideaF);
+ const groups=ideaF==='all'&&used.length>1?used.map(k=>`<li class="gh">${IDT[k][0]} ${IDT[k][1]}</li>`+shown.filter(i=>i.t===k).map(row).join('')).join(''):shown.map(row).join('');
+ $('#ideas').innerHTML=`<h3>Merkliste für ${p.name?esc(p.name):'sie'}</h3><p class="hint">Was sie nebenbei erwähnt – Geschenke, Lieblingssachen, Orte.</p>
+  <div class="mk-add"><button class="mk-cat" id="mkCat" aria-expanded="${catOpen}" aria-label="Kategorie: ${IDT[ideaT][1]}" title="${IDT[ideaT][1]}">${IDT[ideaT][0]}</button>
+   <input type="text" id="ideaTxt" maxlength="120" placeholder="Neue Idee …" aria-label="Neue Idee"><button class="mk-plus" id="ideaAdd" aria-label="Merken">+</button></div>
+  ${catOpen?`<div class="mk-cats">${catBtns(ideaT,'data-it')}</div>`:''}
+  ${used.length>1?`<div class="mk-filter"><button data-if="all" class="${ideaF==='all'?'on':''}">Alle ${open.length}</button>${used.map(k=>`<button data-if="${k}" class="${ideaF===k?'on':''}" title="${IDT[k][1]}">${IDT[k][0]} ${open.filter(i=>i.t===k).length}</button>`).join('')}</div>`:''}
+  ${shown.length?`<ul class="mk">${groups}</ul>`:''}
+  ${done.length?`<details class="iddone"${done.some(i=>i.id===ideaEdit)?' open':''}><summary>Erledigt (${done.length})</summary><ul class="mk">${done.map(row).join('')}</ul></details>`:''}`;
+ const ed=$('#ideaEd');if(ed){ed.focus();ed.setSelectionRange(ed.value.length,ed.value.length)}
 }
-$('#ideas').onclick=e=>{const p=P(),t=e.target.closest('[data-it]'),o=e.target.closest('[data-ido]'),d=e.target.closest('[data-idd]');
- if(t){ideaT=t.dataset.it;const v=$('#ideaTxt').value;renderIdeas(p);$('#ideaTxt').value=v;$('#ideaTxt').focus();return}
- if(o){const i=p.ideas.find(x=>x.id===o.dataset.ido);if(i){i.done=!i.done;save();render();toast(i.done?'Erledigt – stark!':'Wieder offen')}return}
- if(d){p.ideas=p.ideas.filter(x=>x.id!==d.dataset.idd);save();render();toast('Gelöscht');return}
+function saveEdit(){const p=P(),i=p.ideas.find(x=>x.id===ideaEdit),v=$('#ideaEd');if(i&&v){const t=v.value.trim();if(t)i.x=t}ideaEdit=null;save();render()}
+$('#ideas').onclick=e=>{const p=P(),q=a=>e.target.closest(`[${a}]`);let b;
+ if(e.target.id==='mkCat'){const v=$('#ideaTxt').value;catOpen=!catOpen;renderIdeas(p);$('#ideaTxt').value=v;return}
+ if(b=q('data-it')){const v=$('#ideaTxt').value;ideaT=b.dataset.it;catOpen=false;renderIdeas(p);$('#ideaTxt').value=v;$('#ideaTxt').focus();return}
+ if(b=q('data-if')){ideaF=b.dataset.if;renderIdeas(p);return}
+ if(b=q('data-ect')){const i=p.ideas.find(x=>x.id===ideaEdit),v=$('#ideaEd').value;if(i){i.t=b.dataset.ect;save();renderIdeas(p);$('#ideaEd').value=v}return}
+ if(b=q('data-ide')){if(ideaEdit)saveEdit();ideaEdit=b.dataset.ide;renderIdeas(p);return}
+ if(b=q('data-idd')){p.ideas=p.ideas.filter(x=>x.id!==b.dataset.idd);if(ideaEdit===b.dataset.idd)ideaEdit=null;save();render();toast('Gelöscht');return}
+ if(e.target.id==='ideaSave'){saveEdit();return}
  if(e.target.id==='ideaAdd')addIdea()};
-$('#ideas').addEventListener('keydown',e=>{if(e.target.id==='ideaTxt'&&e.key==='Enter'){e.preventDefault();addIdea()}});
+$('#ideas').onchange=e=>{const c=e.target.closest('[data-ido]');if(!c)return;const p=P(),i=p.ideas.find(x=>x.id===c.dataset.ido);if(i){i.done=c.checked;save();setTimeout(render,250);toast(i.done?'Erledigt – stark!':'Wieder offen')}};
+$('#ideas').addEventListener('keydown',e=>{if(e.key==='Escape'&&ideaEdit){ideaEdit=null;renderIdeas(P());return}if(e.key!=='Enter')return;if(e.target.id==='ideaTxt'){e.preventDefault();addIdea()}else if(e.target.id==='ideaEd'){e.preventDefault();saveEdit()}});
 function addIdea(){const p=P(),x=$('#ideaTxt').value.trim();if(!x){$('#ideaTxt').focus();return}
- p.ideas.unshift({id:uid(),t:ideaT,x,ts:Date.now(),done:false});save();render();$('#ideaTxt').focus();toast(IDT[ideaT][0]+' Gemerkt')}
+ p.ideas.unshift({id:uid(),t:ideaT,x,ts:Date.now(),done:false});catOpen=false;save();render();$('#ideaTxt').focus();toast(IDT[ideaT][0]+' Gemerkt')}
 // Muster: in welchen Phasen lagen Ereignisse? Nur sichtbar, wenn es Einträge gibt – nichts wird abgefragt.
 const GRP=[['mens','Periode',['mens']],['foll','Follikelphase',['foll']],['fert','Fruchtbare Tage',['fert','ovu']],['lut','Lutealphase',['lut']],['pms','Vor der Periode',['pms']]];
 function renderMuster(p,T){
