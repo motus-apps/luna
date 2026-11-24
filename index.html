@@ -74,6 +74,17 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .quiet button,.quiet a{min-height:44px;padding:0 2px;border:0;border-radius:6px;background:none;color:var(--ink);font:600 15px Figtree,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;display:inline-flex;align-items:center}
 .fixbox{padding-top:14px;border-top:1px solid var(--line)}.fixbox label{margin-top:0}
 .fixbox input[type=date]{max-width:220px}.fixbox .row{margin-top:4px}
+.opt{font-weight:400;color:var(--mut);opacity:.8;margin-left:4px}
+.evl{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.evl li{display:flex;align-items:center;gap:12px;padding:8px 6px 8px 12px;border:1px solid var(--line);border-radius:14px}
+.evl .em{font-size:22px;flex:none}.evl div{flex:1;min-width:0}.evl b{display:block;font-size:15px}.evl b small{display:inline;color:var(--mut);font-weight:400;font-size:13px}
+.evl input[type=text]{border:0;padding:2px 0;background:none;font-size:15px;border-radius:0;width:100%}.evl input:focus{outline:none;box-shadow:0 1px 0 var(--pc)}
+.evl button{min-height:44px;width:44px;padding:0;flex:none;border:0}
+.next li i.ev{width:auto;height:auto;background:none;font-style:normal;font-size:15px}
+.mu{margin-top:24px}.mu ul{list-style:none;padding:0;margin:14px 0;display:grid;gap:14px}
+.mh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin-bottom:6px}.mh span{color:var(--mut);font-size:14px}
+.mbar{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+.ideas li{border-left:3px solid var(--fert);padding:2px 0 2px 12px}.ideas p{margin:2px 0 0}.ideas small{color:var(--mut)}
 .week{margin-top:32px}.week h3{margin-bottom:12px}
 .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .days div{display:grid;justify-items:center;gap:6px}
@@ -122,6 +133,7 @@ textarea{min-height:90px;resize:vertical}
 .c.fut::after{opacity:.55}
 .c.today{box-shadow:0 0 0 3px var(--ink)}
 .c.sel{outline:3px solid var(--lut);outline-offset:1px}
+.c .evm{position:absolute;top:3px;left:5px;font-size:11px;line-height:1}
 .c .dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--ink);opacity:.7}
 .c.p-mens:not(.fut) .dot{background:#fff}
 #day{margin-top:22px}
@@ -280,11 +292,7 @@ header{padding-top:max(20px,env(safe-area-inset-top))}
   <h2 id="histTitle">Verlauf</h2>
   <div class="stats" id="stats"></div>
   <ul class="hist" id="hist"></ul>
-  <div class="card" style="margin-top:24px">
-    <h3>Frühere Periode nachtragen</h3>
-    <p class="hint">Je mehr Zyklen eingetragen sind, desto genauer wird die Prognose.</p>
-    <div class="row" style="margin-top:12px"><input type="date" id="addDate" style="max-width:220px"><button id="addBtn">Hinzufügen</button></div>
-  </div>
+  <div id="muster"></div>
 </section>
 
 <section class="view" id="v-einstellungen">
@@ -356,12 +364,14 @@ const inDays=d=>d===0?'heute':d===1?'morgen':d===-1?'gestern':d>0?`in ${d} Tagen
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,Math.round(x)));
 const uid=()=>Math.random().toString(36).slice(2,9);
 const EMO=['🌸','🌙','🌷','🦋','✨','💜','🌻','🍓','🌊','🌿','☀️','🔥','💐','👑','🐱','🍒'];
-const person=(o={})=>({id:uid(),name:'',emoji:'🌸',starts:[],cycle:28,period:5,auto:true,notes:{},...o});
+const person=(o={})=>({id:uid(),name:'',emoji:'🌸',starts:[],cycle:28,period:5,auto:true,notes:{},events:[],...o});
 const fresh=()=>{const p=person();return{v:2,persons:[p],active:p.id,notify:{on:false,pms:true,fert:true,buffer:true,mood:true,period:true},cal:{on:false,dismissed:false,neutral:false,all:true,seq:0,hash:''}}};
 function migrate(o){
  if(!o)return fresh();
  if(!o.persons){const p=person({starts:o.starts||[],cycle:o.cycle||28,period:o.period||5,auto:o.auto!==false,notes:o.notes||{}});const f=fresh();f.persons=[p];f.active=p.id;return f}
- const f=fresh();return{...f,...o,notify:{...f.notify,...o.notify},cal:{...f.cal,...o.cal}};
+ const f=fresh(),r={...f,...o,notify:{...f.notify,...o.notify},cal:{...f.cal,...o.cal}};
+ r.persons.forEach(p=>{if(!Array.isArray(p.events))p.events=[];if(!p.notes)p.notes={}});
+ return r;
 }
 let canSave=true;
 function load(){try{const r=localStorage.getItem(KEY);return migrate(r&&JSON.parse(r))}catch(e){canSave=false;return fresh()}}
@@ -394,6 +404,13 @@ const YOU={
  late:{m:[2,2,2,2],s:'Ein paar Tage Verspätung sind häufig – Stress, Krankheit oder Reisen verschieben den Zyklus. Kein Grund zur Panik.',ok:['Gelassen bleiben','Ganz normal weitermachen'],no:['Ständig nachfragen','Wild spekulieren']}
 };
 const LEG=[['mens','Periode'],['foll','Follikelphase'],['fert','Fruchtbar'],['ovu','Eisprung'],['lut','Lutealphase'],['pms','Vor der Periode']];
+// Optionale Ereignisse im Kalender: [Emoji, Name, Platzhalter für die Notiz, jährlich wiederkehrend]
+const EVT={geb:['🎂','Geburtstag','Wessen Geburtstag?',1],jt:['💍','Jahrestag','Was feiert ihr?',1],sex:['❤️','Sex','',0],streit:['⚡','Streit','Worum ging’s?',0],
+ schoen:['✨','Schöner Moment','Was war schön?',0],idee:['💡','Erkenntnis','Was hast du verstanden?',0],sonst:['📌','Sonstiges','Was steht an?',0]};
+// Ereignisse an Tag n (jährliche ab dem eingetragenen Datum jedes Jahr am selben Tag)
+function evOn(p,n){const k=toS(n);return (p.events||[]).filter(e=>EVT[e.t]&&(e.d===k||(EVT[e.t][3]&&e.d.slice(4)===k.slice(4)&&e.d<k)))}
+function evYears(e,n){const y=+toS(n).slice(0,4)-+e.d.slice(0,4);if(y<=0)return'';return e.t==='geb'?`wird ${y}`:`${y} ${y===1?'Jahr':'Jahre'}`}
+const evLabel=(e,n)=>{const v=EVT[e.t],y=EVT[e.t][3]?evYears(e,n):'';return `${v[1]}${e.x?' · '+esc(e.x):''}${y?' · '+y:''}`};
 const SYM=['Krämpfe','Kopfweh','Müde','Gereizt','Heißhunger','Empfindlich','Gut drauf','Viel Energie'];
 const legend=()=>LEG.map(([k,n])=>`<span><i style="background:var(--${k})"></i>${n}</span>`).join('');
 const pname=p=>p.name||'Ohne Name';
@@ -485,7 +502,9 @@ function renderToday(){
  const days=[],changes=[];let prev=inf.ph;
  for(let k=0;k<7;k++){const n=T+k,d=info(p,n,T),phk=d?d.ph:'late';
   days.push(`<div class="${k?'':'t'}" style="--pc:var(--${phk})"><small>${k?fmt(n,{weekday:'short'}).replace('.',''):'Heute'}</small><span title="${PH[phk].n}">${fmt(n,{day:'numeric'})}</span></div>`);
-  if(k&&phk!==prev&&changes.length<3)changes.push(`<li style="--pc:var(--${phk})"><i></i><b>${k===1?'Morgen':fmt(n,{weekday:'short',day:'numeric',month:'short'})}</b><span>${phk==='mens'?'Periode erwartet':PH[phk].n}</span></li>`);
+  const dl=k===0?'Heute':k===1?'Morgen':fmt(n,{weekday:'short',day:'numeric',month:'short'});
+  for(const e of evOn(p,n))changes.push(`<li><i class="ev" aria-hidden="true">${EVT[e.t][0]}</i><b>${dl}</b><span>${evLabel(e,n)}</span></li>`);
+  if(k&&phk!==prev)changes.push(`<li style="--pc:var(--${phk})"><i></i><b>${dl}</b><span>${phk==='mens'?'Periode erwartet':PH[phk].n}</span></li>`);
   prev=phk}
  const cards=[
   ['Nächste Periode',late?'überfällig':inDays(ns.n-T),late?`seit ${pl(ns.late,'Tag','Tagen')}`:wd(ns.n)],
@@ -507,7 +526,7 @@ function renderToday(){
   ${quiet}
  </article>
  <div class="week"><h3>Die nächsten 7 Tage</h3><div class="days">${days.join('')}</div>
-  <ul class="next">${changes.join('')||`<li style="--pc:var(--${inf.ph})"><i></i><span>${ph.n} geht die ganze Woche weiter</span></li>`}</ul></div>
+  <ul class="next">${changes.slice(0,6).join('')||`<li style="--pc:var(--${inf.ph})"><i></i><span>${ph.n} geht die ganze Woche weiter</span></li>`}</ul></div>
  <div class="grid">${cards.map(c=>`<div class="card"><small>${c[0]}</small><strong>${c[1]}</strong><span>${c[2]}</span></div>`).join('')}</div>
  <div class="up"><h3>Die nächsten Perioden</h3><ol>${ups}</ol>
  <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${p.auto&&gaps(p).length?' (Ø aus dem Verlauf)':''} und ${Pd} Tagen Periode, zuletzt abgeglichen am ${fmt(starts(p).at(-1),{day:'numeric',month:'long',year:'numeric'})}. Alles Schätzungen – jede ist anders, einfach fragen hilft am meisten.</p></div>`;
@@ -541,23 +560,34 @@ function renderCal(){
   const cls=['c',inf?'p-'+inf.ph:'',inf&&(inf.proj||n>T)?'fut':'',n===T?'today':'',sel===n?'sel':''].join(' ');
   const pc=inf&&inf.ph!=='mens'?`style="--pc:var(--${inf.ph})"`:'';
   const lab=`${fmt(n,{weekday:'long',day:'numeric',month:'long'})}${inf?', '+PH[inf.ph].n:''}${st.includes(n)?', Periodenbeginn':''}`;
-  h+=`<button class="${cls}" ${pc} data-n="${n}" aria-label="${lab}">${i+1}${nt&&(nt.sym.length||nt.text)?'<span class="dot"></span>':''}</button>`;
+  const ev=evOn(p,n),lab2=lab+(ev.length?', '+ev.map(e=>EVT[e.t][1]).join(', '):'');
+  h+=`<button class="${cls}" ${pc} data-n="${n}" aria-label="${lab2}">${i+1}${ev.length?`<span class="evm" aria-hidden="true">${EVT[ev[0].t][0]}</span>`:''}${nt&&(nt.sym.length||nt.text)?'<span class="dot"></span>':''}</button>`;
  }
  $('#cal').innerHTML=h;$('#leg2').innerHTML=legend()+'<span><i style="border:1.5px dashed var(--mens)"></i>Prognose</span>';
  renderDay();
 }
 function renderDay(){
- const box=$('#day'),p=P();if(sel===null){box.innerHTML='<p class="hint" style="text-align:center;margin-top:18px">Tag antippen, um Periodenbeginn oder Notizen einzutragen.</p>';return}
- const n=sel,T=T0(),inf=info(p,n,T),k=toS(n),nt=p.notes[k]||{sym:[],text:''},isS=p.starts.includes(k);
- box.innerHTML=`<div class="card" style="--pc:var(--${inf?inf.ph:'late'})">
+ const box=$('#day'),p=P();if(sel===null){box.innerHTML='<p class="hint" style="text-align:center;margin-top:18px">Tag antippen für Details. Wer mag, kann dort auch Ereignisse wie Geburtstage festhalten.</p>';return}
+ const n=sel,T=T0(),inf=info(p,n,T),k=toS(n),nt=p.notes[k]||{sym:[],text:''},isS=p.starts.includes(k),evs=evOn(p,n);
+ box.innerHTML=`<div class="card dayc" style="--pc:var(--${inf?inf.ph:'late'})">
   <small>${fmt(n,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</small>
-  <strong>${inf?`${inf.ph==='late'?'Verspätet':'Zyklustag '+inf.day} · ${PH[inf.ph].n}`:'Vor dem ersten Eintrag'}</strong>
+  <strong>${inf?`Zyklustag ${inf.day} · ${PH[inf.ph].n}`:'Vor dem ersten Eintrag'}</strong>
   ${inf&&(inf.proj||n>T)?'<span>Prognose</span>':''}
-  <div class="row" style="margin-top:14px">${n>T?'':isS?'<button class="danger" id="dS">Periodenbeginn entfernen</button>':'<button class="pri" id="aS">Periode begann an diesem Tag</button>'}</div>
-  <label>Wie geht’s ${p.name?esc(p.name):'ihr'}?</label><div class="chips">${SYM.map(s=>`<button data-s="${s}" class="${nt.sym.includes(s)?'on':''}" aria-pressed="${nt.sym.includes(s)}">${s}</button>`).join('')}</div>
-  <label for="nTxt">Notiz</label><textarea id="nTxt" placeholder="z. B. Termin bei der Frauenärztin, war heute sehr müde …">${esc(nt.text)}</textarea></div>`;
+  ${evs.length?`<ul class="evl">${evs.map(e=>{const v=EVT[e.t],y=v[3]?evYears(e,n):'';return `<li><span class="em" aria-hidden="true">${v[0]}</span><div><b>${v[1]}${y?' · '+y:''}${v[3]&&e.d!==k?` <small>seit ${fmt(toN(e.d),{year:'numeric'})}</small>`:''}</b>
+   <input type="text" data-ev="${e.id}" value="${esc(e.x||'')}" placeholder="${v[2]||'Notiz (optional)'}" maxlength="120" aria-label="Notiz zu ${v[1]}"></div>
+   <button class="ghost" data-del="${e.id}" aria-label="${v[1]} entfernen">✕</button></li>`}).join('')}</ul>`:''}
+  <p class="lbl" style="margin-top:18px">Ereignis festhalten <span class="opt">optional</span></p>
+  <div class="chips">${Object.entries(EVT).map(([t,v])=>`<button data-add="${t}">${v[0]} ${v[1]}</button>`).join('')}</div>
+  ${n>T?'':`<p class="lbl" style="margin-top:18px">Wie war ${p.name?esc(p.name):'sie'} drauf? <span class="opt">optional</span></p>
+  <div class="chips">${SYM.map(s=>`<button data-s="${s}" class="${nt.sym.includes(s)?'on':''}" aria-pressed="${nt.sym.includes(s)}">${s}</button>`).join('')}</div>`}
+  <label for="nTxt">Notiz</label><textarea id="nTxt" placeholder="Was dir zu diesem Tag wichtig ist …">${esc(nt.text)}</textarea>
+  ${n>T?'':`<div class="row" style="margin-top:14px">${isS?'<button class="ghost danger" id="dS">Periodenbeginn entfernen</button>':'<button class="ghost" id="aS">Periode begann an diesem Tag</button>'}</div>`}</div>`;
  const setN=f=>{const c=p.notes[k]||{sym:[],text:''};f(c);if(!c.sym.length&&!c.text.trim())delete p.notes[k];else p.notes[k]=c;save()};
  box.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const s=b.dataset.s;setN(c=>{c.sym=c.sym.includes(s)?c.sym.filter(x=>x!==s):[...c.sym,s]});renderCal()});
+ box.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const t=b.dataset.add,id=uid();p.events.push({id,t,d:k,x:''});save();render();
+  const inp=$(`[data-ev="${id}"]`);if(inp&&EVT[t][2])inp.focus();toast(EVT[t][0]+' '+EVT[t][1]+' gespeichert')});
+ box.querySelectorAll('[data-ev]').forEach(i=>i.onchange=()=>{const e=p.events.find(x=>x.id===i.dataset.ev);if(e){e.x=i.value.trim();save();render()}});
+ box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{p.events=p.events.filter(x=>x.id!==b.dataset.del);save();render();toast('Entfernt')});
  $('#nTxt').onchange=e=>{setN(c=>c.text=e.target.value);renderCal();toast('Notiz gespeichert')};
  const a=$('#aS'),d=$('#dS');
  if(a)a.onclick=()=>{addStart(p,n);toast('Periodenbeginn eingetragen');render()};
@@ -573,17 +603,29 @@ function renderHist(){
  $('#histTitle').textContent=p.name?`Verlauf · ${p.name}`:'Verlauf';
  const sv=(l,v,s)=>`<div class="card"><small>${l}</small><strong>${v}</strong><span>${s}</span></div>`;
  $('#stats').innerHTML=g.length?sv('Ø Zykluslänge',avg(p)+' Tage',p.auto?'letzte 6 Zyklen':'aus Einstellungen')+sv('Kürzester',Math.min(...g)+' Tage','')+sv('Längster',Math.max(...g)+' Tage','')+sv('Erfasste Zyklen',g.length,'abgeschlossen')
-  :sv('Noch kein ganzer Zyklus',st.length?'1 Eintrag':'–','Ab dem zweiten Periodenbeginn wird der Schnitt berechnet');
+  :sv('Zykluslänge',avg(p)+' Tage','aus den Einstellungen');
  const mx=Math.max(35,...g);
  $('#hist').innerHTML=st.length?st.map((n,i)=>{const len=i<st.length-1?st[i+1]-n:null;
-  return `<li><b>${fmt(n,{day:'numeric',month:'short',year:'numeric'})}</b><div class="bar"><i style="width:${Math.min(100,(len||T-n+1)/mx*100).toFixed(1)}%;opacity:${len?1:.4}"></i></div><span>${len?len+' Tage':'läuft · Tag '+(T-n+1)}</span><button class="ghost danger" data-d="${toS(n)}" aria-label="Eintrag ${fmt(n)} löschen">Löschen</button></li>`}).reverse().join('')
+  const kz=len?C.parts(len,p):1;
+  return `<li><b>${fmt(n,{day:'numeric',month:'short',year:'numeric'})}</b><div class="bar"><i style="width:${Math.min(100,(len?len/kz:Math.min(T-n+1,avg(p)))/mx*100).toFixed(1)}%;opacity:${len?1:.4}"></i></div><span>${len?(kz>1?`${len} Tage · ≈ ${kz} Zyklen`:len+' Tage'):'seitdem weitergerechnet'}</span><button class="ghost danger" data-d="${toS(n)}" aria-label="Eintrag ${fmt(n)} löschen">Löschen</button></li>`}).reverse().join('')
   :'<li><span>Noch keine Einträge.</span></li>';
- $('#addDate').max=toS(T);
+ renderMuster(p,T);
+}
+// Muster: in welchen Phasen lagen Ereignisse? Nur sichtbar, wenn es Einträge gibt – nichts wird abgefragt.
+const GRP=[['mens','Periode',['mens']],['foll','Follikelphase',['foll']],['fert','Fruchtbare Tage',['fert','ovu']],['lut','Lutealphase',['lut']],['pms','Vor der Periode',['pms']]];
+function renderMuster(p,T){
+ const past=(p.events||[]).filter(e=>EVT[e.t]&&!EVT[e.t][3]&&toN(e.d)<=T);
+ const rows=['streit','schoen','sex','idee'].map(t=>{const es=past.filter(e=>e.t===t).map(e=>info(p,toN(e.d),T)).filter(Boolean);if(!es.length)return'';
+  const cnt=GRP.map(g=>es.filter(x=>g[2].includes(x.ph)).length),top=cnt.indexOf(Math.max(...cnt));
+  const bar=GRP.map((g,i)=>cnt[i]?`<i style="flex:${cnt[i]};background:var(--${g[0]})" title="${g[1]}: ${cnt[i]}"></i>`:'').join('');
+  return `<li><div class="mh"><b>${EVT[t][0]} ${EVT[t][1]}</b><span>${es.length} ${es.length===1?'Eintrag':'Einträge'}${es.length>=3?` · am häufigsten: ${GRP[top][1]} (${cnt[top]})`:''}</span></div><div class="mbar">${bar}</div></li>`}).join('');
+ const ideas=past.filter(e=>e.t==='idee'&&e.x).sort((a,b)=>a.d<b.d?1:-1);
+ $('#muster').innerHTML=(rows?`<div class="card mu"><h3>Muster</h3><p class="hint">In welcher Phase lagen deine Einträge? Die Phasen sind geschätzt – erst mit mehreren Einträgen wird ein Muster sichtbar.</p><ul>${rows}</ul>
+  <div class="legend" style="justify-content:flex-start">${GRP.map(g=>`<span><i style="background:var(--${g[0]})"></i>${g[1]}</span>`).join('')}</div></div>`:'')
+  +(ideas.length?`<div class="card mu"><h3>Deine Erkenntnisse</h3><ul class="ideas">${ideas.map(e=>{const i=info(p,toN(e.d),T);return `<li><small>${fmt(toN(e.d),{day:'numeric',month:'short',year:'numeric'})}${i?' · '+PH[i.ph].n:''}</small><p>${esc(e.x)}</p></li>`}).join('')}</ul></div>`:'');
 }
 const twoStep=(b,label,ask,fn)=>{if(b.dataset.ok){fn()}else{b.dataset.ok=1;b.textContent=ask;setTimeout(()=>{if(b.isConnected){delete b.dataset.ok;b.textContent=label}},3500)}};
 $('#hist').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;twoStep(b,'Löschen','Wirklich?',()=>{delStart(P(),b.dataset.d);toast('Eintrag gelöscht');render()})};
-$('#addBtn').onclick=()=>{const d=$('#addDate').value;if(!d)return toast('Bitte ein Datum wählen');if(toN(d)>T0())return toast('Datum liegt in der Zukunft');
- toast(addStart(P(),toN(d))?'Nachgetragen':'Ist schon eingetragen');$('#addDate').value='';render()};
 
 /* ---------- Einstellungen ---------- */
 const hasN='Notification' in window&&'serviceWorker' in navigator;
@@ -596,7 +638,7 @@ async function regPeriodic(){
 }
 function renderNotify(){
  const n=S.notify,s=$('#nStatus'),btn=$('#nOn');
- document.querySelectorAll('[data-n]').forEach(c=>{c.checked=n[c.dataset.n]!==false;c.disabled=!n.on});
+ document.querySelectorAll('input[data-n]').forEach(c=>{c.checked=n[c.dataset.n]!==false;c.disabled=!n.on});
  $('#nTest').hidden=!(n.on&&hasN&&perm()==='granted');
  if(!hasN){btn.hidden=true;s.className='status warn';s.textContent='Dieser Browser kann keine Benachrichtigungen anzeigen. Nutze stattdessen „Im Kalender erinnern“.';return}
  if(perm()==='denied'){btn.hidden=true;s.className='status warn';s.textContent='Benachrichtigungen sind für Luna blockiert. Erlauben kannst du sie in den Website- bzw. App-Einstellungen des Browsers.';return}
@@ -616,7 +658,7 @@ $('#nOn').onclick=async()=>{
 $('#nTest').onclick=async()=>{try{const r=await navigator.serviceWorker.ready;const p=P();
  const title=C.who(p)+' · So sieht’s aus',body='Luna meldet sich bei emotionalen Tagen, fruchtbaren Tagen, Hochphasen und rund um die Periode.',key='luna-test-'+Date.now();
  await r.showNotification(title,{body,icon:'icons/icon-192.png',tag:key});inbox=(await idbGet('inbox'))||[];inbox.unshift({key,title,body,ts:Date.now(),read:false});await idbSet('inbox',inbox);renderInbox()}catch(e){toast('Test hat nicht geklappt')}};
-document.querySelectorAll('[data-n]').forEach(c=>c.onchange=()=>{S.notify[c.dataset.n]=c.checked;save()});
+document.querySelectorAll('input[data-n]').forEach(c=>c.onchange=()=>{S.notify[c.dataset.n]=c.checked;save()});
 
 function renderSet(){
  const p=P();

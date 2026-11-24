@@ -7,13 +7,13 @@
   const fmt = (n, o = { day: 'numeric', month: 'long' }) => new Date(n * DAY).toLocaleDateString('de-DE', { timeZone: 'UTC', ...o });
 
   const starts = p => [...new Set(p.starts)].map(toN).sort((a, b) => a - b);
+  // Einträge sind nur gelegentliche Korrekturen: Eine große Lücke (z. B. 56 Tage) zählt als mehrere Zyklen
+  const parts = (d, p) => { const ref = p.cycle || 28; return d > ref * 1.6 ? Math.round(d / ref) : 1; };
   const gaps = p => {
     const s = starts(p), g = [];
-    // Einträge sind nur gelegentliche Korrekturen: Eine große Lücke (z. B. 56 Tage) zählt als mehrere Zyklen
-    const ref = p.cycle || 28;
     for (let i = 1; i < s.length; i++) {
-      const d = s[i] - s[i - 1], k = d > ref * 1.6 ? Math.round(d / ref) : 1, len = Math.round(d / k);
-      if (d >= 15 && d <= 400 && len >= 18 && len <= 60) g.push(len);
+      const d = s[i] - s[i - 1], k = parts(d, p), len = Math.round(d / k);
+      if (d >= 15 && d <= 400 && len >= 18 && len <= 60) for (let j = 0; j < k; j++) g.push(len);
     }
     return g;
   };
@@ -41,8 +41,15 @@
     let i = st.length - 1;
     while (st[i] > n) i--;
     let s = st[i], len, proj = false;
-    if (i < st.length - 1) len = st[i + 1] - s;
-    else {
+    if (i < st.length - 1) {
+      // Lücke zwischen zwei Einträgen gleichmäßig in Zyklen aufteilen
+      const d = st[i + 1] - s, k = parts(d, p), at = j => s + Math.round(j * d / k);
+      let j = Math.min(k - 1, Math.floor((n - s) * k / d));
+      if (j < k - 1 && n >= at(j + 1)) j++;
+      if (j > 0 && n < at(j)) j--;
+      const a = at(j), b = at(j + 1);
+      s = a; len = b - a; proj = j > 0;
+    } else {
       // ohne neuen Eintrag läuft die Rechnung einfach Zyklus für Zyklus weiter
       len = L;
       if (n >= s + L) { s += Math.floor((n - s) / L) * L; proj = true; }
@@ -107,5 +114,5 @@
     return out.filter(x => x.to >= T);
   }
 
-  g.LunaCore = { DAY, toN, toS, T0, fmt, starts, gaps, avg, phase, info, nextStart, events, spans, who };
+  g.LunaCore = { DAY, toN, toS, T0, fmt, starts, parts, gaps, avg, phase, info, nextStart, events, spans, who };
 })(typeof self !== 'undefined' ? self : this);
