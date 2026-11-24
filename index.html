@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Luna</title>
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -107,23 +107,80 @@ textarea{min-height:90px;resize:vertical}
 .status.warn{background:color-mix(in srgb,var(--fert) 18%,var(--card))}
 .banner{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:22px;padding:16px 20px;border-radius:20px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--lut)}
 .banner b{display:block;font:600 19px/1.25 Fraunces,serif}.banner p{margin:4px 0 0;color:var(--mut);font-size:15px;max-width:56ch}
+.bell{position:relative;margin-left:auto;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;color:var(--ink);background:var(--card);border:1px solid var(--line)}
+.bell.on{background:var(--ink);color:var(--bg)}
+.bell .cnt{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--mens);color:#fff;font:600 12px/20px Figtree,sans-serif;text-align:center}
+.inbox{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
+.inbox li{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:4px}
+.inbox li.unread{border-left:5px solid var(--mens)}
+.inbox li b{font-weight:600}.inbox li p{margin:0;color:var(--mut);font-size:15px}
+.inbox li time{font-size:13px;color:var(--mut)}
+.inbox li .row button{min-height:40px;padding:6px 14px;font-size:15px}
+.inbox .empty{text-align:center;color:var(--mut);border-style:dashed}
+@media(min-width:600px){.seasons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.seasons{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .note{font-size:13px;color:var(--mut);margin-top:40px;max-width:70ch}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;transition:.25s;pointer-events:none;font-weight:500;max-width:90vw}
 #toast.on{opacity:1;transform:translate(-50%,0)}
+
+nav a svg{display:none}
+header{padding-top:max(20px,env(safe-area-inset-top))}
+/* Wissen */
+.wi-lead{font-size:clamp(17px,2.2vw,20px);color:var(--mut);max-width:58ch;margin:14px 0 26px}
+.vs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.vs .card{display:grid;gap:6px;align-content:start}
+.vs .who{display:flex;align-items:center;gap:10px;font:600 22px Fraunces,serif}
+.vs .who svg{flex:none}
+.vs .big{font:600 clamp(28px,5vw,40px)/1 Fraunces,serif;margin-top:4px}
+.vs p{margin:0;color:var(--mut);font-size:15px}
+.chartcard{margin-top:12px}
+.fig{position:relative;min-height:300px;margin-top:10px}.fig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fig text{font:500 13px Figtree,sans-serif;fill:var(--mut)}
+.fig text.k{font-weight:600;fill:var(--ink)}
+.seasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin-top:14px}
+.season{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px 20px 20px;border-top:6px solid var(--pc)}
+.season.now{box-shadow:0 0 0 2px var(--pc)}
+.season .now-tag{position:absolute;top:14px;right:14px;font-size:13px;font-weight:600;color:var(--bg);background:var(--pc);padding:3px 10px;border-radius:999px}
+.season svg.ill{width:84px;height:84px;display:block}
+.season h3{margin-top:8px}.season .sub{color:var(--pc);font-weight:600;font-size:15px}
+.season dl{margin:12px 0 0;display:grid;gap:10px}
+.season dt{font-size:13px;font-weight:600;color:var(--mut)}
+.season dd{margin:2px 0 0;font-size:15px;line-height:1.45}
+.meters{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:center;margin-top:14px;font-size:13px;color:var(--mut)}
+.meters i{display:flex;gap:4px}.meters i b{flex:1;max-width:26px;height:8px;border-radius:4px;background:var(--line)}
+.meters i b.f{background:var(--pc)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin-top:14px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.fact s{display:block;color:var(--mut);font-size:14px;text-decoration-color:var(--mens);text-decoration-thickness:2px}
+.fact p{margin:6px 0 0;font-size:15px}
+.sec{margin-top:44px}
+.more{color:var(--ink);font-weight:600;text-underline-offset:3px}
+@media(max-width:700px){
+ nav{position:fixed;left:0;right:0;bottom:0;z-index:20;border-radius:0;border:0;border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:visible}
+ nav a{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;padding:6px 2px;border-radius:12px;min-height:52px}
+ nav a svg{display:block}nav a.on{background:none;color:var(--mens)}
+ nav a span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ nav a span[data-s]{font-size:0}nav a span[data-s]::after{content:attr(data-s);font-size:12px}
+ body{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+ #toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+}
+@media(max-width:520px){.vs{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){#toast{transition:none}}
 @media(max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.ring{width:min(100%,320px)}}
-@media(max-width:420px){nav{width:100%}nav a{padding:9px 11px;font-size:15px}.cal{gap:4px}.c{border-radius:10px;font-size:14px}.c::after{bottom:4px}.emo{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:420px){.cal{gap:4px}.c{border-radius:10px;font-size:14px}.c::after{bottom:4px}.emo{grid-template-columns:repeat(6,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
   <div class="brand"><img src="icons/icon.svg" alt="" width="34" height="34">Luna</div>
+  <a href="#mitteilungen" class="bell" id="bell" aria-label="Mitteilungen"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg><span class="cnt" id="bellCnt" hidden></span></a>
   <nav id="nav">
-    <a href="#heute" data-v="heute">Heute</a>
-    <a href="#kalender" data-v="kalender">Kalender</a>
-    <a href="#verlauf" data-v="verlauf">Verlauf</a>
-    <a href="#einstellungen" data-v="einstellungen">Einstellungen</a>
+    <a href="#heute" data-v="heute"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="3.5" r="2" fill="currentColor"/></svg><span>Heute</span></a>
+    <a href="#kalender" data-v="kalender"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Kalender</span></a>
+    <a href="#wissen" data-v="wissen"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13.5C7 18 10 18.5 12 20c2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5V20"/></svg><span>Wissen</span></a>
+    <a href="#verlauf" data-v="verlauf"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9"/></svg><span>Verlauf</span></a>
+    <a href="#einstellungen" data-v="einstellungen"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg><span data-s="Optionen">Einstellungen</span></a>
   </nav>
 </header>
 <div class="people" id="people"></div>
@@ -139,6 +196,41 @@ textarea{min-height:90px;resize:vertical}
   <div class="cal" id="cal"></div>
   <div class="legend" id="leg2"></div>
   <div id="day"></div>
+</section>
+
+<section class="view" id="v-wissen">
+  <h2>Ihr Zyklus, einfach erklärt</h2>
+  <p class="wi-lead">Dein Körper läuft im 24-Stunden-Takt, ihrer im Monatstakt. Stell dir vor, dein Monat hätte vier Jahreszeiten – so ungefähr fühlt sich ein Zyklus an.</p>
+  <div class="vs">
+    <div class="card"><div class="who"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--ink)" opacity=".08"/><circle cx="20" cy="20" r="11" fill="none" stroke="var(--ink)" stroke-width="2.5"/><path d="M20 13v7l5 3" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>Er</div><div class="big">24 Stunden</div><p>Testosteron ist morgens am höchsten und sinkt bis zum Abend. Morgen geht das Spiel genauso von vorn – Energie hängt bei ihm vor allem an Schlaf und Stress.</p></div>
+    <div class="card"><div class="who"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--mens)" opacity=".12"/><path d="M21.0 8.0A12 12 0 0 1 32.0 19.0" stroke="var(--mens)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M32.0 21.0A12 12 0 0 1 21.0 32.0" stroke="var(--foll)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M19.0 32.0A12 12 0 0 1 8.0 21.0" stroke="var(--fert)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M8.0 19.0A12 12 0 0 1 19.0 8.0" stroke="var(--lut)" stroke-width="4" fill="none" stroke-linecap="round"/></svg>Sie</div><div class="big">ca. 28 Tage</div><p>Vier Hormone steigen und fallen über rund vier Wochen. Energie, Laune, Lust, Hunger und Schlaf verändern sich deshalb von Woche zu Woche.</p></div>
+  </div>
+  <div class="card chartcard"><h3>Ein Monat Hormone</h3>
+    <div class="fig" id="hormFig"><svg id="horm" role="img" aria-label="Hormonverlauf über 28 Tage: bei ihr starke Wellen, bei ihm jeden Tag das gleiche Muster"></svg></div>
+    <div class="legend"><span><i style="background:var(--mens)"></i>Östrogen</span><span><i style="background:var(--lut)"></i>Progesteron</span><span><i style="background:var(--fert)"></i>LH (löst Eisprung aus)</span><span><i style="background:var(--ink)"></i>Testosteron (er)</span></div>
+    <p class="hint">Vereinfacht, für einen 28-Tage-Zyklus.</p>
+  </div>
+  <div class="sec"><h2 style="font-size:clamp(26px,4vw,34px)">Die vier Jahreszeiten</h2>
+  <p class="hint">Tage gelten für 28 Tage. Ist der Zyklus länger, dauert vor allem der Frühling länger – der Herbst bleibt meist rund 14 Tage.</p>
+  <div class="seasons"><article class="season" id="wi-winter" style="--pc:var(--mens)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M70 28a34 34 0 1 0 22 52A28 28 0 1 1 70 28z" fill="var(--pc)"/><circle cx="84" cy="34" r="3.5" fill="var(--pc)" opacity=".6"/><circle cx="94" cy="50" r="2.5" fill="var(--pc)" opacity=".5"/><circle cx="30" cy="30" r="2.5" fill="var(--pc)" opacity=".5"/></svg><h3>Winter</h3><div class="sub">Periode · Tag 1–5</div>
+<dl><div><dt>Im Körper</dt><dd>Östrogen und Progesteron sind am Tiefpunkt, die Gebärmutterschleimhaut wird abgestoßen.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Weniger Energie, eher nach innen gekehrt. Krämpfe, Rücken- oder Kopfschmerzen sind häufig.</dd></div><div><dt>Was du tun kannst</dt><dd>Wärmflasche, Tee, Lieblingsessen. Aufgaben abnehmen und Pläne locker halten.</dd></div></dl>
+<div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class=""></b><b class=""></b><b class=""></b><b class=""></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Gesellig</span><i><b class="f"></b><b class=""></b><b class=""></b><b class=""></b><b class=""></b></i></div></article><article class="season" id="wi-fruehling" style="--pc:var(--foll)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M28 90q32-12 64 0" stroke="var(--pc)" stroke-width="5" fill="none" stroke-linecap="round" opacity=".5"/><path d="M60 88V52" stroke="var(--pc)" stroke-width="5" stroke-linecap="round"/><path d="M60 60C60 42 46 34 30 36c0 16 12 26 30 24z" fill="var(--pc)"/><path d="M60 54c0-16 12-26 30-24 0 16-12 26-30 24z" fill="var(--pc)" opacity=".75"/></svg><h3>Frühling</h3><div class="sub">Follikelphase · Tag 6–11</div>
+<dl><div><dt>Im Körper</dt><dd>Östrogen steigt, in den Eierstöcken reift ein neues Ei heran.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Die Energie kommt zurück: neugierig, optimistisch, offen für Neues.</dd></div><div><dt>Was du tun kannst</dt><dd>Gute Zeit für Pläne, Ausflüge, Sport und neue Ideen – gemeinsam.</dd></div></dl>
+<div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b></i><span>Gesellig</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class=""></b></i></div></article><article class="season" id="wi-sommer" style="--pc:var(--fert)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(0 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(45 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(90 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(135 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(180 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(225 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(270 60 60)"/><path d="M60 18v12" stroke="var(--pc)" stroke-width="5" stroke-linecap="round" transform="rotate(315 60 60)"/><circle cx="60" cy="60" r="20" fill="var(--pc)"/><circle cx="54" cy="54" r="6" fill="#fff" opacity=".35"/></svg><h3>Sommer</h3><div class="sub">Eisprung · Tag 12–16</div>
+<dl><div><dt>Im Körper</dt><dd>Östrogen auf dem Höhepunkt, eine LH-Welle löst den Eisprung aus. Das Ei lebt etwa 24 Stunden.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Oft Höhepunkt bei Energie, Selbstbewusstsein und Lust – gesellig und gesprächig.</dd></div><div><dt>Was du tun kannst</dt><dd>Date-Abend, Komplimente, zusammen etwas erleben. Kein Kinderwunsch: jetzt besonders sicher verhüten.</dd></div></dl>
+<div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i><span>Gesellig</span><i><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b><b class="f"></b></i></div></article><article class="season" id="wi-herbst" style="--pc:var(--lut)"><svg class="ill" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--pc)" opacity=".14"/><g transform="rotate(-25 60 60)"><path d="M60 22C84 36 88 70 60 96 32 70 36 36 60 22z" fill="var(--pc)"/><path d="M60 34v66M60 56l-12-8M60 56l12-8M60 72l-14-9M60 72l14-9" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round" fill="none"/></g><path d="M88 84c8 2 12 8 10 14-7 0-12-6-10-14z" fill="var(--pc)" opacity=".55"/></svg><h3>Herbst</h3><div class="sub">Lutealphase · Tag 17–28</div>
+<dl><div><dt>Im Körper</dt><dd>Progesteron übernimmt: wirkt beruhigend, Körpertemperatur und Hunger steigen leicht. Zum Ende fallen beide Hormone ab.</dd></div><div><dt>Wie sie sich oft fühlt</dt><dd>Erst ruhig und gemütlich. In den letzten Tagen oft PMS: gereizt, traurig, Heißhunger, Brustspannen, schlechter Schlaf.</dd></div><div><dt>Was du tun kannst</dt><dd>Geduld, Gemütlichkeit, Snacks bereithalten. Und nie: „Hast du deine Tage?“</dd></div></dl>
+<div class="meters" aria-label="Typische Tendenz"><span>Energie</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Laune</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Lust</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i><span>Gesellig</span><i><b class="f"></b><b class="f"></b><b class=""></b><b class=""></b><b class=""></b></i></div></article></div></div>
+  <div class="sec"><h2 style="font-size:clamp(26px,4vw,34px)">Mythen und Fakten</h2>
+  <div class="facts"><div class="fact"><s>Ein Zyklus hat 28 Tage.</s><p>Normal sind etwa 21 bis 35 Tage – und er schwankt auch bei derselben Frau.</p></div><div class="fact"><s>Der Eisprung ist an Tag 14.</s><p>Er liegt etwa 14 Tage <em>vor</em> der nächsten Periode. Bei 32 Tagen also eher um Tag 18.</p></div><div class="fact"><s>Fruchtbar ist man nur am Eisprung.</s><p>Spermien überleben bis zu 5 Tage – fruchtbar sind rund 6 Tage pro Zyklus.</p></div><div class="fact"><s>Schlechte Laune sind halt die Hormone.</s><p>Hormone beeinflussen, erklären aber nicht alles. Gefühle ernst nehmen statt wegerklären.</p></div><div class="fact"><s>Starke Regelschmerzen sind normal.</s><p>Leichte Krämpfe sind häufig. Schmerzen, die den Alltag lahmlegen, gehören zur Frauenärztin – z. B. wegen Endometriose.</p></div></div></div>
+  <p class="hint" style="margin-top:28px">Jede Frau ist anders – die Balken zeigen typische Tendenzen, keine Regeln. Der beste Tipp bleibt: einfach fragen, wie es ihr geht.</p>
+</section>
+
+<section class="view" id="v-mitteilungen">
+  <h2>Mitteilungen</h2>
+  <p class="hint">Alles, was Luna dir geschickt hat. Als gelesen markierte Mitteilungen verschwinden auch vom App-Icon und aus der Benachrichtigungsleiste.</p>
+  <div class="row" style="margin-top:16px"><button id="inAllRead">Alle als gelesen</button><button class="ghost danger" id="inAllDel">Alle löschen</button></div>
+  <ul class="inbox" id="inbox"></ul>
 </section>
 
 <section class="view" id="v-verlauf">
@@ -332,13 +424,14 @@ function renderToday(){
  v.innerHTML=calBanner()+`<div class="hero" style="--pc:var(--${inf.ph})">
   <div><div class="ring">${ringSVG(p,inf.day,inf.len)}<div class="mid">${mid}</div></div><div class="legend">${legend()}</div></div>
   <div><span class="tag">${p.name?esc(p.emoji+' '+p.name)+' · ':''}${fmt(T,{weekday:'long',day:'numeric',month:'long'})}</span>
-   <h2 style="margin-top:10px">${ph.n}</h2><p class="lead">${ph.t}</p>
+   <h2 style="margin-top:10px">${ph.n}</h2><p class="lead">${ph.t} <a class="more" href="#wissen" id="moreLink">Mehr dazu</a></p>
    <ul class="tips">${ph.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
    <div class="row"><button class="pri" id="startNow" ${isStartToday?'disabled':''}>${isStartToday?'Heute eingetragen':'Periode hat heute begonnen'}</button>
    <a class="btn" href="#kalender">Anderer Tag?</a></div></div></div>
  <div class="grid">${cards.map(c=>`<div class="card"><small>${c[0]}</small><strong>${c[1]}</strong><span>${c[2]}</span></div>`).join('')}</div>
  <div class="up"><h3>Die nächsten Perioden</h3><ol>${ups}</ol>
  <p class="hint">Gerechnet mit ${L} Tagen Zykluslänge${p.auto&&gaps(p).length?' (Ø aus dem Verlauf)':''} und ${Pd} Tagen Periode.</p></div>`;
+ $('#moreLink').onclick=()=>{wantScroll=SEASON[inf.ph]};
  $('#startNow').onclick=()=>{if(addStart(p,T)){toast('Neuer Zyklus gestartet');render()}};
  bindBanner();
 }
@@ -428,7 +521,8 @@ $('#nOn').onclick=async()=>{
  S.notify.on=true;save();bgSync=await regPeriodic();renderNotify();toast('Benachrichtigungen an');swCheck();
 };
 $('#nTest').onclick=async()=>{try{const r=await navigator.serviceWorker.ready;const p=P();
- await r.showNotification(C.who(p)+' · So sieht’s aus',{body:'Luna meldet sich bei emotionalen Tagen, fruchtbaren Tagen, Hochphasen und rund um die Periode.',icon:'icons/icon-192.png',tag:'luna-test'})}catch(e){toast('Test hat nicht geklappt')}};
+ const title=C.who(p)+' · So sieht’s aus',body='Luna meldet sich bei emotionalen Tagen, fruchtbaren Tagen, Hochphasen und rund um die Periode.',key='luna-test-'+Date.now();
+ await r.showNotification(title,{body,icon:'icons/icon-192.png',tag:key});inbox=(await idbGet('inbox'))||[];inbox.unshift({key,title,body,ts:Date.now(),read:false});await idbSet('inbox',inbox);renderInbox()}catch(e){toast('Test hat nicht geklappt')}};
 document.querySelectorAll('[data-n]').forEach(c=>c.onchange=()=>{S.notify[c.dataset.n]=c.checked;save()});
 
 function renderSet(){
@@ -495,15 +589,86 @@ $('#impBtn').onclick=()=>{try{const o=JSON.parse($('#imp').value),d=o.data||o;
  S=migrate(d);save();$('#imp').value='';sel=null;render();toast('Backup wiederhergestellt')}catch(e){toast('Das sieht nicht nach einem gültigen Backup aus')}};
 $('#rstBtn').onclick=e=>twoStep(e.target,'Alle Daten löschen','Wirklich alles löschen?',()=>{S=fresh();save();sel=null;adding=false;render();location.hash='#heute';toast('Alles gelöscht')});
 
+
+/* ---------- Wissen ---------- */
+const SEASON={mens:'winter',foll:'fruehling',fert:'sommer',ovu:'sommer',lut:'herbst',pms:'herbst',late:'herbst'};
+let wantScroll=null;
+function renderWissen(){
+ const p=P(),T=T0(),inf=p.starts.length?info(p,T,T):null,cur=inf&&SEASON[inf.ph];
+ document.querySelectorAll('.season').forEach(el=>{const on=el.id==='wi-'+cur;el.classList.toggle('now',on);
+  let t=el.querySelector('.now-tag');if(on&&!t){t=document.createElement('span');t.className='now-tag';el.appendChild(t)}
+  if(t){if(on)t.textContent='Gerade'+(p.name?' bei '+p.name:'');else t.remove()}});
+}
+const hs=$('#horm');
+const gs=(x,m,s)=>Math.exp(-((x-m)**2)/(2*s*s));
+function drawHorm(){
+ const W=hs.clientWidth,H=hs.clientHeight;if(!W)return;
+ const narrow=W<520,pl=narrow?30:40,pr=8,top=26,herTop=top,herH=H*.58,himTop=herTop+herH+28,himH=H-himTop-26;
+ const X=d=>pl+(d-1)/27*(W-pl-pr);
+ const line=(f,y0,h,step=.1)=>{let d='';for(let t=1;t<=28.0001;t+=step){d+=(d?'L':'M')+X(t).toFixed(1)+' '+(y0+h-f(t)*h).toFixed(1)}return d};
+ const B=[[1,5.5,'mens','Winter'],[5.5,11.5,'foll','Frühling'],[11.5,16.5,'fert','Sommer'],[16.5,28,'lut','Herbst']];
+ let h=B.map(([a,b,c,n])=>`<rect x="${X(a)}" y="${herTop}" width="${X(b)-X(a)}" height="${herH}" fill="var(--${c})" opacity=".1"/><text x="${(X(a)+X(b))/2}" y="${herTop-8}" text-anchor="middle" style="fill:var(--${c});font-weight:600">${narrow&&n==='Frühling'?'Frühl.':n}</text>`).join('');
+ const E=t=>.1+.78*gs(t,12.5,2.8)+.36*gs(t,21.5,3.4),Pg=t=>.04+.86*gs(t,21,3.4),LH=t=>.03+.92*gs(t,13.6,.75);
+ h+=`<path d="${line(Pg,herTop,herH)}" stroke="var(--lut)" stroke-width="3" fill="none"/>`
+  +`<path d="${line(E,herTop,herH)}" stroke="var(--mens)" stroke-width="3" fill="none"/>`
+  +`<path d="${line(LH,herTop,herH,.05)}" stroke="var(--fert)" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/>`
+  +`<text class="k" x="${pl-6}" y="${herTop+16}" text-anchor="end">Sie</text>`;
+ const Te=t=>.5+.28*Math.cos(2*Math.PI*((t-1)-.33));
+ h+=`<rect x="${X(1)}" y="${himTop}" width="${X(28)-X(1)}" height="${himH}" rx="8" fill="var(--ink)" opacity=".05"/>`
+  +`<path d="${line(Te,himTop+4,himH-8,.04)}" stroke="var(--ink)" stroke-width="2" fill="none" opacity=".75"/>`
+  +`<text class="k" x="${pl-6}" y="${himTop+16}" text-anchor="end">Er</text>`;
+ const ticks=narrow?[1,14,28]:[1,7,14,21,28];
+ h+=ticks.map(d=>`<text x="${X(d)}" y="${H-6}" text-anchor="middle">Tag ${d}</text>`).join('');
+ hs.innerHTML=h;
+}
+const hro=new ResizeObserver(drawHorm);hro.observe(hs);
+
+/* ---------- Mitteilungen ---------- */
+const idbGet=async k=>{try{const d=await idb();return await new Promise(r=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(undefined)})}catch(e){}};
+const idbSet=async(k,v)=>{try{const d=await idb();await new Promise(r=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=r;t.onerror=r})}catch(e){}};
+const swReg=async()=>{try{return 'serviceWorker' in navigator?await navigator.serviceWorker.getRegistration():null}catch(e){return null}};
+let inbox=[];
+async function loadInbox(){
+ inbox=(await idbGet('inbox'))||[];
+ // System-Benachrichtigungen, die noch angezeigt werden, aber (noch) nicht in der Liste stehen
+ const r=await swReg();
+ if(r&&r.getNotifications){try{const act=await r.getNotifications();let ch=false;
+  for(const n of act){if(n.tag&&inbox.some(x=>x.key===n.tag))continue;inbox.unshift({key:n.tag||('n'+Date.now()+Math.random()),title:n.title,body:n.body,ts:n.timestamp||Date.now(),read:false});ch=true}
+  if(ch)await idbSet('inbox',inbox)}catch(e){}}
+ renderInbox();
+}
+async function closeSys(keys){const r=await swReg();if(!r||!r.getNotifications)return;
+ try{(await r.getNotifications()).forEach(n=>{if(!keys||keys.includes(n.tag))n.close()})}catch(e){}}
+function badge(n){try{if(n&&navigator.setAppBadge)navigator.setAppBadge(n);else if(navigator.clearAppBadge)navigator.clearAppBadge()}catch(e){}}
+function renderInbox(){
+ const un=inbox.filter(x=>!x.read).length,c=$('#bellCnt');
+ c.hidden=!un;c.textContent=un>9?'9+':un;$('#bell').setAttribute('aria-label',un?`Mitteilungen, ${un} ungelesen`:'Mitteilungen');
+ badge(un);
+ const when=ts=>{const d=new Date(ts),n=Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/C.DAY),T=T0();
+  return (n===T?'Heute':n===T-1?'Gestern':fmt(n,{weekday:'short',day:'numeric',month:'short'}))+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})};
+ $('#inbox').innerHTML=inbox.length?inbox.map(x=>`<li class="${x.read?'':'unread'}"><time>${when(x.ts)}</time><b>${esc(x.title)}</b>${x.body?`<p>${esc(x.body)}</p>`:''}
+  <div class="row" style="margin-top:6px">${x.read?'':`<button data-r="${esc(x.key)}">Gelesen</button>`}<button class="ghost danger" data-x="${esc(x.key)}">Löschen</button></div></li>`).join('')
+  :'<li class="empty">Keine Mitteilungen. Hier erscheint alles, was Luna dir schickt.</li>';
+ $('#inAllRead').disabled=!un;$('#inAllDel').disabled=!inbox.length;
+}
+async function saveInbox(closeKeys){await idbSet('inbox',inbox);await closeSys(closeKeys);renderInbox()}
+$('#inbox').onclick=e=>{const r=e.target.closest('[data-r]'),x=e.target.closest('[data-x]');
+ if(r){const k=r.dataset.r;inbox.forEach(i=>{if(i.key===k)i.read=true});saveInbox([k])}
+ if(x){const k=x.dataset.x;inbox=inbox.filter(i=>i.key!==k);saveInbox([k])}};
+$('#inAllRead').onclick=()=>{inbox.forEach(i=>i.read=true);saveInbox(null);toast('Alles gelesen')};
+$('#inAllDel').onclick=e=>twoStep(e.target,'Alle löschen','Wirklich alle löschen?',()=>{inbox=[];saveInbox(null);toast('Mitteilungen gelöscht')});
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data==='inbox')loadInbox()});
 /* ---------- Routing ---------- */
-const VIEWS=['heute','kalender','verlauf','einstellungen'];
+const VIEWS=['heute','kalender','wissen','verlauf','einstellungen','mitteilungen'];
 function route(){const h=location.hash.slice(1),v=VIEWS.includes(h)?h:'heute';
- VIEWS.forEach(x=>{$('#v-'+x).classList.toggle('on',x===v);document.querySelector(`nav a[data-v=${x}]`).classList.toggle('on',x===v)})}
-function render(){renderPeople();renderToday();renderCal();renderHist();renderSet();foot()}
+ VIEWS.forEach(x=>{$('#v-'+x).classList.toggle('on',x===v);const a=document.querySelector(`nav a[data-v=${x}]`);if(a)a.classList.toggle('on',x===v)});
+ $('#bell').classList.toggle('on',v==='mitteilungen');if(v==='mitteilungen')loadInbox();
+ if(v==='wissen'){drawHorm();if(wantScroll){const el=$('#wi-'+wantScroll);wantScroll=null;if(el)setTimeout(()=>el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),60)}}else scrollTo(0,0)}
+function render(){renderPeople();renderToday();renderCal();renderWissen();renderHist();renderSet();foot()}
 addEventListener('hashchange',route);
-render();route();mirror();
+render();route();mirror();loadInbox();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(async()=>{if(S.notify.on){bgSync=await regPeriodic();renderNotify()}swCheck()}).catch(()=>{});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){render();swCheck()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){render();swCheck();loadInbox()}});
 let lastT=T0();setInterval(()=>{if(T0()!==lastT){lastT=T0();render();swCheck()}},60000);
 }
 </script>
