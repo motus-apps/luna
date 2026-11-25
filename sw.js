@@ -1,6 +1,6 @@
 importScripts('core.js');
 
-const CACHE = 'luna-v26';
+const CACHE = 'luna-v27';
 const FILES = ['./', 'index.html', 'core.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'fonts/fraunces.woff2', 'fonts/figtree.woff2'];
 
 self.addEventListener('install', e => {
