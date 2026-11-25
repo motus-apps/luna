@@ -97,8 +97,12 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .mk-plus{background:var(--ink);color:var(--bg);font-size:22px;font-weight:500}
 .mk-cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .mk-cats button{min-height:36px;padding:4px 12px;font-size:14px;font-weight:500;gap:6px}.mk-cats button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.mk-filter{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px}
-.mk-filter button{min-height:32px;padding:2px 12px;font-size:14px;font-weight:500;flex:none}.mk-filter button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mk-filter{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.mk-filter>span{font-size:13px;font-weight:600;color:var(--mut)}
+.sel{position:relative;display:inline-flex;margin:0;font-weight:500}
+.sel select{appearance:none;-webkit-appearance:none;font:500 15px Figtree,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;min-height:40px;padding:6px 38px 6px 16px;cursor:pointer;max-width:70vw;text-overflow:ellipsis}
+.sel select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.sel::after{content:"";position:absolute;right:16px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(45deg);pointer-events:none}
 .mk{list-style:none;margin:8px 0 0;padding:0}
 .mk li{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);min-height:44px}
 .mk li.gh{min-height:0;border:0;padding:12px 0 2px;font-size:13px;font-weight:600;color:var(--mut)}
@@ -785,7 +789,7 @@ function renderIdeas(p){
   <div class="mk-add"><button class="mk-cat" id="mkCat" aria-expanded="${catOpen}" aria-label="Kategorie: ${IDT[ideaT][1]}" title="${IDT[ideaT][1]}">${IDT[ideaT][0]}</button>
    <input type="text" id="ideaTxt" maxlength="120" placeholder="Neue Idee …" aria-label="Neue Idee"><button class="mk-plus" id="ideaAdd" aria-label="Merken">+</button></div>
   ${catOpen?`<div class="mk-cats">${catBtns(ideaT,'data-it')}</div>`:''}
-  ${used.length>1?`<div class="mk-filter"><button data-if="all" class="${ideaF==='all'?'on':''}">Alle ${open.length}</button>${used.map(k=>`<button data-if="${k}" class="${ideaF===k?'on':''}" title="${IDT[k][1]}">${IDT[k][0]} ${open.filter(i=>i.t===k).length}</button>`).join('')}</div>`:''}
+  ${used.length>1?`<div class="mk-filter"><span>Anzeigen</span><label class="sel"><select id="ideaFilter" aria-label="Kategorie anzeigen"><option value="all"${ideaF==='all'?' selected':''}>Alle (${open.length})</option>${used.map(k=>`<option value="${k}"${ideaF===k?' selected':''}>${IDT[k][0]}  ${IDT[k][1]} (${open.filter(i=>i.t===k).length})</option>`).join('')}</select></label></div>`:''}
   ${shown.length?`<ul class="mk">${groups}</ul>`:''}
   ${done.length?`<details class="iddone"${done.some(i=>i.id===ideaEdit)?' open':''}><summary>Erledigt (${done.length})</summary><ul class="mk">${done.map(row).join('')}</ul></details>`:''}`;
  const ed=$('#ideaEd');if(ed){ed.focus();ed.setSelectionRange(ed.value.length,ed.value.length)}
@@ -794,13 +798,12 @@ function saveEdit(){const p=P(),i=p.ideas.find(x=>x.id===ideaEdit),v=$('#ideaEd'
 $('#ideas').onclick=e=>{const p=P(),q=a=>e.target.closest(`[${a}]`);let b;
  if(e.target.id==='mkCat'){const v=$('#ideaTxt').value;catOpen=!catOpen;renderIdeas(p);$('#ideaTxt').value=v;return}
  if(b=q('data-it')){const v=$('#ideaTxt').value;ideaT=b.dataset.it;catOpen=false;renderIdeas(p);$('#ideaTxt').value=v;$('#ideaTxt').focus();return}
- if(b=q('data-if')){ideaF=b.dataset.if;renderIdeas(p);return}
  if(b=q('data-ect')){const i=p.ideas.find(x=>x.id===ideaEdit),v=$('#ideaEd').value;if(i){i.t=b.dataset.ect;save();renderIdeas(p);$('#ideaEd').value=v}return}
  if(b=q('data-ide')){if(ideaEdit)saveEdit();ideaEdit=b.dataset.ide;renderIdeas(p);return}
  if(b=q('data-idd')){p.ideas=p.ideas.filter(x=>x.id!==b.dataset.idd);if(ideaEdit===b.dataset.idd)ideaEdit=null;save();render();toast('Gelöscht');return}
  if(e.target.id==='ideaSave'){saveEdit();return}
  if(e.target.id==='ideaAdd')addIdea()};
-$('#ideas').onchange=e=>{const c=e.target.closest('[data-ido]');if(!c)return;const p=P(),i=p.ideas.find(x=>x.id===c.dataset.ido);if(i){i.done=c.checked;save();setTimeout(render,250);toast(i.done?'Erledigt – stark!':'Wieder offen')}};
+$('#ideas').onchange=e=>{if(e.target.id==='ideaFilter'){ideaF=e.target.value;renderIdeas(P());return}const c=e.target.closest('[data-ido]');if(!c)return;const p=P(),i=p.ideas.find(x=>x.id===c.dataset.ido);if(i){i.done=c.checked;save();setTimeout(render,250);toast(i.done?'Erledigt – stark!':'Wieder offen')}};
 $('#ideas').addEventListener('keydown',e=>{if(e.key==='Escape'&&ideaEdit){ideaEdit=null;renderIdeas(P());return}if(e.key!=='Enter')return;if(e.target.id==='ideaTxt'){e.preventDefault();addIdea()}else if(e.target.id==='ideaEd'){e.preventDefault();saveEdit()}});
 function addIdea(){const p=P(),x=$('#ideaTxt').value.trim();if(!x){$('#ideaTxt').focus();return}
  p.ideas.unshift({id:uid(),t:ideaT,x,ts:Date.now(),done:false});catOpen=false;save();render();$('#ideaTxt').focus();toast(IDT[ideaT][0]+' Gemerkt')}
