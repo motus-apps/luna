@@ -534,7 +534,7 @@ const TIPS={
 TIPS.ovu=TIPS.fert;TIPS.late=TIPS.lut;
 function tipOf(p,ph,T){const l=TIPS[ph].filter(t=>!(t[1]&&fam(p)));return l[T%l.length][0]}
 // Ideen-Liste pro Person
-const IDT={gift:['🎁','Geschenke'],food:['🍫','Essen & Snacks'],place:['📍','Ausflüge & Restaurants'],media:['📚','Bücher, Filme & Musik'],misc:['💬','Sonstiges']};
+const IDT={gift:['🎁','Geschenke'],event:['🎟️','Events & Konzerte'],place:['📍','Ausflüge'],food:['🍽️','Essen & Restaurants'],film:['🎬','Filme'],music:['🎵','Musik'],misc:['💬','Sonstiges']};
 // Rückblick: einmalige Ereignisse in den letzten Zyklen
 function reviews(p,T,max=3){const inf=info(p,T,T);if(!inf)return[];const out=[];let s=inf.s;
  for(let k=0;k<max;k++){const pi=info(p,s-1,T);if(!pi)break;const a=pi.s,e=s-1;
@@ -771,6 +771,7 @@ function renderHist(){
 let ideaT='misc',ideaF='all',ideaEdit=null,catOpen=false;
 const catBtns=(cur,attr)=>Object.entries(IDT).map(([k,v])=>`<button class="${k===cur?'on':''}" ${attr}="${k}" aria-pressed="${k===cur}" title="${v[1]}">${v[0]}<span>${v[1]}</span></button>`).join('');
 function renderIdeas(p){
+ p.ideas.forEach(i=>{if(!IDT[i.t])i.t='misc'});
  const open=p.ideas.filter(i=>!i.done),done=p.ideas.filter(i=>i.done),used=Object.keys(IDT).filter(k=>open.some(i=>i.t===k));
  if(ideaF!=='all'&&!used.includes(ideaF))ideaF='all';
  const row=i=>ideaEdit===i.id
@@ -780,7 +781,7 @@ function renderIdeas(p){
     <button class="tx" data-ide="${i.id}">${ideaF==='all'&&!i.done?'':IDT[i.t][0]+' '}${esc(i.x)}</button><button class="x" data-idd="${i.id}" aria-label="${esc(i.x)} löschen">✕</button></li>`;
  const shown=ideaF==='all'?open:open.filter(i=>i.t===ideaF);
  const groups=ideaF==='all'&&used.length>1?used.map(k=>`<li class="gh">${IDT[k][0]} ${IDT[k][1]}</li>`+shown.filter(i=>i.t===k).map(row).join('')).join(''):shown.map(row).join('');
- $('#ideas').innerHTML=`<h3>Merkliste für ${p.name?esc(p.name):'sie'}</h3><p class="hint">Was sie nebenbei erwähnt – Geschenke, Lieblingssachen, Orte.</p>
+ $('#ideas').innerHTML=`<h3>Merkliste für ${p.name?esc(p.name):'sie'}</h3><p class="hint">Was sie nebenbei erwähnt – Geschenke, Events, Ausflüge, Lieblingsessen.</p>
   <div class="mk-add"><button class="mk-cat" id="mkCat" aria-expanded="${catOpen}" aria-label="Kategorie: ${IDT[ideaT][1]}" title="${IDT[ideaT][1]}">${IDT[ideaT][0]}</button>
    <input type="text" id="ideaTxt" maxlength="120" placeholder="Neue Idee …" aria-label="Neue Idee"><button class="mk-plus" id="ideaAdd" aria-label="Merken">+</button></div>
   ${catOpen?`<div class="mk-cats">${catBtns(ideaT,'data-it')}</div>`:''}
