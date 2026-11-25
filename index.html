@@ -110,6 +110,7 @@ section.view{display:none;padding:20px 0 48px}section.view.on{display:block}
 .dd2-menu button.on{background:color-mix(in srgb,var(--ink) 9%,transparent);font-weight:600}
 .dd2-menu .dd-e{width:22px;text-align:center;flex:none}.dd2-menu .dd-n{flex:1;white-space:nowrap}
 .dd2-menu .dd-c{color:var(--mut);font-size:13px;font-weight:500;min-width:18px;text-align:right}.dd2-menu .dd-k{width:16px;flex:none;font-weight:700;text-align:center}
+.dd2-menu.left{left:0;right:auto}
 @keyframes ddin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.dd2-menu{animation:none}.dd2-btn::after{transition:none}}
 .mk{list-style:none;margin:8px 0 0;padding:0}
@@ -795,9 +796,9 @@ function renderIdeas(p){
  const shown=ideaF==='all'?open:open.filter(i=>i.t===ideaF);
  const groups=ideaF==='all'&&used.length>1?used.map(k=>`<li class="gh">${IDT[k][0]} ${IDT[k][1]}</li>`+shown.filter(i=>i.t===k).map(row).join('')).join(''):shown.map(row).join('');
  $('#ideas').innerHTML=`<h3>Merkliste für ${p.name?esc(p.name):'sie'}</h3><p class="hint">Was sie nebenbei erwähnt – Geschenke, Events, Ausflüge, Lieblingsessen.</p>
-  <div class="mk-add"><button class="mk-cat" id="mkCat" aria-expanded="${catOpen}" aria-label="Kategorie: ${IDT[ideaT][1]}" title="${IDT[ideaT][1]}">${IDT[ideaT][0]}</button>
+  <div class="mk-add"><div class="dd2"><button class="mk-cat" id="mkCat" aria-haspopup="listbox" aria-expanded="${catOpen}" aria-label="Kategorie: ${IDT[ideaT][1]}" title="${IDT[ideaT][1]}">${IDT[ideaT][0]}</button>
+   ${catOpen?`<ul class="dd2-menu left" role="listbox" aria-label="Kategorie für neue Idee">${Object.entries(IDT).map(([k,v])=>`<li role="option" aria-selected="${k===ideaT}"><button data-it="${k}" class="${k===ideaT?'on':''}"><span class="dd-e">${v[0]}</span><span class="dd-n">${v[1]}</span><span class="dd-k" aria-hidden="true">${k===ideaT?'✓':''}</span></button></li>`).join('')}</ul>`:''}</div>
    <input type="text" id="ideaTxt" maxlength="120" placeholder="Neue Idee …" aria-label="Neue Idee"><button class="mk-plus" id="ideaAdd" aria-label="Merken">+</button></div>
-  ${catOpen?`<div class="mk-cats">${catBtns(ideaT,'data-it')}</div>`:''}
   ${used.length>1?(()=>{const opts=[['all','✨','Alle',open.length],...used.map(k=>[k,IDT[k][0],IDT[k][1],open.filter(i=>i.t===k).length])],cur=opts.find(o=>o[0]===ideaF);
    return `<div class="mk-filter"><span>Anzeigen</span><div class="dd2"><button class="dd2-btn" id="fBtn" aria-haspopup="listbox" aria-expanded="${filtOpen}">${ideaF==='all'?'':cur[1]+' '}${cur[2]} <small>${cur[3]}</small></button>
     ${filtOpen?`<ul class="dd2-menu" role="listbox" aria-label="Kategorie anzeigen">${opts.map(o=>`<li role="option" aria-selected="${o[0]===ideaF}"><button data-if="${o[0]}" class="${o[0]===ideaF?'on':''}"><span class="dd-e">${o[1]}</span><span class="dd-n">${o[2]}</span><span class="dd-c">${o[3]}</span><span class="dd-k" aria-hidden="true">${o[0]===ideaF?'✓':''}</span></button></li>`).join('')}</ul>`:''}</div></div>`})():''}
@@ -805,12 +806,12 @@ function renderIdeas(p){
   ${done.length?`<details class="iddone"${done.some(i=>i.id===ideaEdit)?' open':''}><summary>Erledigt (${done.length})</summary><ul class="mk">${done.map(row).join('')}</ul></details>`:''}`;
  const ed=$('#ideaEd');if(ed){ed.focus();ed.setSelectionRange(ed.value.length,ed.value.length)}
 }
-document.addEventListener('click',e=>{if(filtOpen&&!e.target.closest('.dd2')){filtOpen=false;renderIdeas(P())}});
+document.addEventListener('click',e=>{if((filtOpen||catOpen)&&!e.target.closest('.dd2')){const v=$('#ideaTxt')?.value||'';filtOpen=catOpen=false;renderIdeas(P());$('#ideaTxt').value=v}});
 function saveEdit(){const p=P(),i=p.ideas.find(x=>x.id===ideaEdit),v=$('#ideaEd');if(i&&v){const t=v.value.trim();if(t)i.x=t}ideaEdit=null;save();render()}
 $('#ideas').onclick=e=>{const p=P(),q=a=>e.target.closest(`[${a}]`);let b;
- if(e.target.closest('#fBtn')){filtOpen=!filtOpen;renderIdeas(p);const f=$(`.dd2-menu .on`);if(f)f.focus();return}
+ if(e.target.closest('#fBtn')){filtOpen=!filtOpen;catOpen=false;renderIdeas(p);const f=$(`.dd2-menu .on`);if(f)f.focus();return}
  if(b=q('data-if')){ideaF=b.dataset.if;filtOpen=false;renderIdeas(p);$('#fBtn').focus();return}
- if(e.target.id==='mkCat'){const v=$('#ideaTxt').value;catOpen=!catOpen;renderIdeas(p);$('#ideaTxt').value=v;return}
+ if(e.target.closest('#mkCat')){const v=$('#ideaTxt').value;catOpen=!catOpen;filtOpen=false;renderIdeas(p);$('#ideaTxt').value=v;const f=$('.dd2-menu .on');if(f)f.focus();return}
  if(b=q('data-it')){const v=$('#ideaTxt').value;ideaT=b.dataset.it;catOpen=false;renderIdeas(p);$('#ideaTxt').value=v;$('#ideaTxt').focus();return}
  if(b=q('data-ect')){const i=p.ideas.find(x=>x.id===ideaEdit),v=$('#ideaEd').value;if(i){i.t=b.dataset.ect;save();renderIdeas(p);$('#ideaEd').value=v}return}
  if(b=q('data-ide')){if(ideaEdit)saveEdit();ideaEdit=b.dataset.ide;renderIdeas(p);return}
@@ -819,8 +820,8 @@ $('#ideas').onclick=e=>{const p=P(),q=a=>e.target.closest(`[${a}]`);let b;
  if(e.target.id==='ideaAdd')addIdea()};
 $('#ideas').onchange=e=>{const c=e.target.closest('[data-ido]');if(!c)return;const p=P(),i=p.ideas.find(x=>x.id===c.dataset.ido);if(i){i.done=c.checked;save();setTimeout(render,250);toast(i.done?'Erledigt – stark!':'Wieder offen')}};
 $('#ideas').addEventListener('keydown',e=>{
- if(filtOpen){const it=[...document.querySelectorAll('.dd2-menu button')],i=it.indexOf(document.activeElement);
-  if(e.key==='Escape'){e.preventDefault();filtOpen=false;renderIdeas(P());$('#fBtn').focus();return}
+ if(filtOpen||catOpen){const it=[...document.querySelectorAll('.dd2-menu button')],i=it.indexOf(document.activeElement);
+  if(e.key==='Escape'){e.preventDefault();const back=catOpen?'#mkCat':'#fBtn',v=$('#ideaTxt').value;filtOpen=catOpen=false;renderIdeas(P());$('#ideaTxt').value=v;$(back).focus();return}
   if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();it[(i+(e.key==='ArrowDown'?1:-1)+it.length)%it.length].focus();return}}
  if(e.key==='Escape'&&ideaEdit){ideaEdit=null;renderIdeas(P());return}if(e.key!=='Enter')return;if(e.target.id==='ideaTxt'){e.preventDefault();addIdea()}else if(e.target.id==='ideaEd'){e.preventDefault();saveEdit()}});
 function addIdea(){const p=P(),x=$('#ideaTxt').value.trim();if(!x){$('#ideaTxt').focus();return}
