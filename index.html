@@ -548,7 +548,7 @@ const TIPS={
 TIPS.ovu=TIPS.fert;TIPS.late=TIPS.lut;
 function tipOf(p,ph,T){const l=TIPS[ph].filter(t=>!(t[1]&&fam(p)));return l[T%l.length][0]}
 // Ideen-Liste pro Person
-const IDT={gift:['🎁','Geschenke'],event:['🎟️','Events & Konzerte'],place:['📍','Ausflüge'],food:['🍽️','Essen & Restaurants'],film:['🎬','Filme'],music:['🎵','Musik'],misc:['💬','Sonstiges']};
+const IDT={gift:['🎁','Geschenke'],event:['🎟️','Events & Konzerte'],place:['📍','Ausflüge'],resto:['🍽️','Restaurants'],food:['🍫','Essen & Snacks'],film:['🎬','Filme'],music:['🎵','Musik'],misc:['💬','Sonstiges']};
 // Rückblick: einmalige Ereignisse in den letzten Zyklen
 function reviews(p,T,max=3){const inf=info(p,T,T);if(!inf)return[];const out=[];let s=inf.s;
  for(let k=0;k<max;k++){const pi=info(p,s-1,T);if(!pi)break;const a=pi.s,e=s-1;
